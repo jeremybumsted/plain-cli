@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // PriorityCmd represents the threads priority command
@@ -29,7 +29,7 @@ func (cmd *PriorityCmd) Run() error {
 	}
 
 	// Get priority name for display
-	priorityName := mcp.FormatPriority(priorityInt)
+	priorityName := plain.FormatPriority(priorityInt)
 
 	// Confirm action unless --yes flag is set
 	confirmed, err := confirmAction(fmt.Sprintf("Change priority to %s?", priorityName), cmd.Yes)
@@ -58,7 +58,7 @@ func (cmd *PriorityCmd) Run() error {
 	thread, err := client.ChangeThreadPriority(threadID, priorityInt)
 	if err != nil {
 		// Handle 404 gracefully
-		if mcpErr, ok := err.(*mcp.Error); ok && mcpErr.StatusCode == 404 {
+		if mcpErr, ok := err.(*plain.Error); ok && mcpErr.StatusCode == 404 {
 			return formatter.Error(fmt.Sprintf("Thread not found: %s", threadID))
 		}
 		return fmt.Errorf("failed to change thread priority: %w", err)

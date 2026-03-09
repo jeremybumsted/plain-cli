@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/jeremybumsted/plain-cli/internal/cache"
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // LabelAddCmd represents the threads label add command
@@ -92,7 +92,7 @@ func (cmd *LabelAddCmd) Run() error {
 	labels, err := client.AddLabels(threadID, labelTypeIDs)
 	if err != nil {
 		// Handle 404 gracefully
-		if mcpErr, ok := err.(*mcp.Error); ok && mcpErr.StatusCode == 404 {
+		if mcpErr, ok := err.(*plain.Error); ok && mcpErr.StatusCode == 404 {
 			return formatter.Error(fmt.Sprintf("Thread not found: %s", threadID))
 		}
 		return fmt.Errorf("failed to add labels: %w", err)

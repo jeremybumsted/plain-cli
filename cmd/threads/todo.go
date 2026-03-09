@@ -3,7 +3,7 @@ package threads
 import (
 	"fmt"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // TodoCmd represents the threads todo command
@@ -47,7 +47,7 @@ func (cmd *TodoCmd) Run() error {
 	thread, err := client.ChangeThreadStatus(threadID, "TODO")
 	if err != nil {
 		// Handle 404 gracefully
-		if mcpErr, ok := err.(*mcp.Error); ok && mcpErr.StatusCode == 404 {
+		if mcpErr, ok := err.(*plain.Error); ok && mcpErr.StatusCode == 404 {
 			return formatter.Error(fmt.Sprintf("Thread not found: %s", threadID))
 		}
 		return fmt.Errorf("failed to change thread status: %w", err)

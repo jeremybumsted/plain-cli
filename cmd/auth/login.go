@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // LoginCmd handles authentication
@@ -55,7 +55,7 @@ func (cmd *LoginCmd) Run() error {
 
 	// Validate token by making a test request
 	formatter.Info("Validating token...")
-	client := mcp.NewClient(token)
+	client := plain.NewClient(token)
 
 	// TODO: Add a method to validate the token (e.g., GetCurrentUser)
 	// For now, we'll just check that we can create a client

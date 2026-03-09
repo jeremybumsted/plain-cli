@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // GetCmd represents the threads get command
@@ -38,7 +38,7 @@ func (cmd *GetCmd) Run() error {
 	thread, err := client.GetThread(threadID, cmd.Timeline)
 	if err != nil {
 		// Handle 404 gracefully
-		if mcpErr, ok := err.(*mcp.Error); ok && mcpErr.StatusCode == 404 {
+		if mcpErr, ok := err.(*plain.Error); ok && mcpErr.StatusCode == 404 {
 			return formatter.Error(fmt.Sprintf("Thread not found: %s", threadID))
 		}
 		return fmt.Errorf("failed to fetch thread: %w", err)
@@ -58,7 +58,7 @@ func (cmd *GetCmd) Run() error {
 }
 
 // displayThread displays thread details in a human-readable format
-func displayThread(formatter interface{}, thread *mcp.Thread, includeTimeline bool) error {
+func displayThread(formatter interface{}, thread *plain.Thread, includeTimeline bool) error {
 	type Formatter interface {
 		Print(message string) error
 		Printf(format string, args ...interface{}) error
@@ -71,7 +71,7 @@ func displayThread(formatter interface{}, thread *mcp.Thread, includeTimeline bo
 	f.Printf("ID:          %s\n", thread.ID)
 	f.Printf("Title:       %s\n", thread.Title)
 	f.Printf("Status:      %s\n", thread.Status)
-	f.Printf("Priority:    %s\n", mcp.FormatPriority(thread.Priority))
+	f.Printf("Priority:    %s\n", plain.FormatPriority(thread.Priority))
 
 	// Display assignee
 	if thread.AssignedTo != nil {

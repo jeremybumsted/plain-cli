@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 func TestSaveLabelCache(t *testing.T) {
@@ -19,7 +19,7 @@ func TestSaveLabelCache(t *testing.T) {
 	defer func() { GetCachePath = oldGetCachePath }()
 
 	// Create test label types
-	labelTypes := []*mcp.LabelType{
+	labelTypes := []*plain.LabelType{
 		{ID: "labelType_1", Name: "Bug"},
 		{ID: "labelType_2", Name: "Feature Request"},
 	}
@@ -56,7 +56,7 @@ func TestLoadLabelCache(t *testing.T) {
 	defer func() { GetCachePath = oldGetCachePath }()
 
 	// Create and save test cache
-	labelTypes := []*mcp.LabelType{
+	labelTypes := []*plain.LabelType{
 		{ID: "labelType_1", Name: "Bug"},
 		{ID: "labelType_2", Name: "Feature Request"},
 	}
@@ -127,7 +127,7 @@ func TestLabelCache_IsFresh(t *testing.T) {
 
 func TestLabelCache_GetLabelTypeByID(t *testing.T) {
 	cache := &LabelCache{
-		LabelTypes: []*mcp.LabelType{
+		LabelTypes: []*plain.LabelType{
 			{ID: "labelType_1", Name: "Bug"},
 			{ID: "labelType_2", Name: "Feature"},
 		},
@@ -151,7 +151,7 @@ func TestLabelCache_GetLabelTypeByID(t *testing.T) {
 
 func TestLabelCache_GetLabelTypeByName(t *testing.T) {
 	cache := &LabelCache{
-		LabelTypes: []*mcp.LabelType{
+		LabelTypes: []*plain.LabelType{
 			{ID: "labelType_1", Name: "Bug"},
 			{ID: "labelType_2", Name: "Feature Request"},
 		},
@@ -189,7 +189,7 @@ func TestLabelCache_GetLabelTypeByName(t *testing.T) {
 
 func TestLabelCache_ResolveLabelIdentifier(t *testing.T) {
 	cache := &LabelCache{
-		LabelTypes: []*mcp.LabelType{
+		LabelTypes: []*plain.LabelType{
 			{ID: "labelType_1", Name: "Bug"},
 			{ID: "labelType_2", Name: "Feature Request"},
 		},
@@ -237,7 +237,7 @@ func TestLabelCache_ResolveLabelIdentifier(t *testing.T) {
 
 func TestLabelCache_ResolveLabelIdentifiers(t *testing.T) {
 	cache := &LabelCache{
-		LabelTypes: []*mcp.LabelType{
+		LabelTypes: []*plain.LabelType{
 			{ID: "labelType_1", Name: "Bug"},
 			{ID: "labelType_2", Name: "Feature Request"},
 		},
@@ -267,7 +267,7 @@ func TestLabelCache_ResolveLabelIdentifiers(t *testing.T) {
 
 func TestLabelCache_GetLabelNames(t *testing.T) {
 	cache := &LabelCache{
-		LabelTypes: []*mcp.LabelType{
+		LabelTypes: []*plain.LabelType{
 			{ID: "labelType_1", Name: "Bug"},
 			{ID: "labelType_2", Name: "Feature Request"},
 		},
@@ -308,7 +308,7 @@ func TestLabelCache_RoundTrip(t *testing.T) {
 	defer func() { GetCachePath = oldGetCachePath }()
 
 	// Create test label types
-	original := []*mcp.LabelType{
+	original := []*plain.LabelType{
 		{ID: "labelType_1", Name: "Bug", Icon: "🐛", Color: "red", IsArchived: false},
 		{ID: "labelType_2", Name: "Feature", Icon: "✨", Color: "blue", IsArchived: false},
 		{ID: "labelType_3", Name: "Archived", Icon: "📦", Color: "gray", IsArchived: true},

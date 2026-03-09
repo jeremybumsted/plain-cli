@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 // LabelCache stores cached label types
 type LabelCache struct {
 	CacheMetadata
-	LabelTypes []*mcp.LabelType `json:"label_types"`
+	LabelTypes []*plain.LabelType `json:"label_types"`
 }
 
 // LoadLabelCache loads the label cache from disk
@@ -41,7 +41,7 @@ func LoadLabelCache() (*LabelCache, error) {
 
 // SaveLabelCache saves label types to the cache file
 // This creates a new cache with current timestamp and default TTL
-func SaveLabelCache(labelTypes []*mcp.LabelType) error {
+func SaveLabelCache(labelTypes []*plain.LabelType) error {
 	cache := &LabelCache{
 		CacheMetadata: CacheMetadata{
 			Version:   LabelCacheVersion,
@@ -66,7 +66,7 @@ func (c *LabelCache) IsFresh() bool {
 
 // GetLabelTypeByID finds a label type by ID in the cache
 // Returns nil if not found
-func (c *LabelCache) GetLabelTypeByID(id string) *mcp.LabelType {
+func (c *LabelCache) GetLabelTypeByID(id string) *plain.LabelType {
 	for _, lt := range c.LabelTypes {
 		if lt.ID == id {
 			return lt
@@ -77,7 +77,7 @@ func (c *LabelCache) GetLabelTypeByID(id string) *mcp.LabelType {
 
 // GetLabelTypeByName finds a label type by name (case-insensitive) in the cache
 // Returns nil if not found
-func (c *LabelCache) GetLabelTypeByName(name string) *mcp.LabelType {
+func (c *LabelCache) GetLabelTypeByName(name string) *plain.LabelType {
 	lowerName := strings.ToLower(name)
 	for _, lt := range c.LabelTypes {
 		if strings.ToLower(lt.Name) == lowerName {

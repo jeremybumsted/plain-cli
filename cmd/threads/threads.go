@@ -2,7 +2,7 @@ package threads
 
 import (
 	"github.com/jeremybumsted/plain-cli/internal/config"
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 	"github.com/jeremybumsted/plain-cli/internal/output"
 )
 
@@ -31,13 +31,13 @@ func getConfig(configPath string) (*config.Config, error) {
 	return config.Load(configPath)
 }
 
-// getClient creates an authenticated MCP client
-func getClient(cfg *config.Config) (*mcp.Client, error) {
+// getClient creates an authenticated Plain API client
+func getClient(cfg *config.Config) (*plain.Client, error) {
 	token, err := cfg.GetToken()
 	if err != nil {
 		return nil, err
 	}
-	return mcp.NewClient(token), nil
+	return plain.NewClient(token), nil
 }
 
 // getFormatter creates an output formatter based on the format string

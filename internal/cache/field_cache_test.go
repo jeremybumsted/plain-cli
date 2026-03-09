@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 func TestSaveFieldCache(t *testing.T) {
@@ -19,7 +19,7 @@ func TestSaveFieldCache(t *testing.T) {
 	defer func() { GetCachePath = oldGetCachePath }()
 
 	// Create test field schemas
-	schemas := []*mcp.ThreadFieldSchema{
+	schemas := []*plain.ThreadFieldSchema{
 		{ID: "field_1", Key: "priority", Label: "Priority", Type: "STRING"},
 		{ID: "field_2", Key: "category", Label: "Category", Type: "ENUM"},
 	}
@@ -56,7 +56,7 @@ func TestLoadFieldCache(t *testing.T) {
 	defer func() { GetCachePath = oldGetCachePath }()
 
 	// Create and save test cache
-	schemas := []*mcp.ThreadFieldSchema{
+	schemas := []*plain.ThreadFieldSchema{
 		{ID: "field_1", Key: "priority", Label: "Priority", Type: "STRING"},
 		{ID: "field_2", Key: "category", Label: "Category", Type: "ENUM"},
 	}
@@ -127,7 +127,7 @@ func TestFieldCache_IsFresh(t *testing.T) {
 
 func TestFieldCache_GetFieldSchemaByID(t *testing.T) {
 	cache := &FieldCache{
-		FieldSchemas: []*mcp.ThreadFieldSchema{
+		FieldSchemas: []*plain.ThreadFieldSchema{
 			{ID: "field_1", Key: "priority", Label: "Priority"},
 			{ID: "field_2", Key: "category", Label: "Category"},
 		},
@@ -151,7 +151,7 @@ func TestFieldCache_GetFieldSchemaByID(t *testing.T) {
 
 func TestFieldCache_GetFieldSchemaByKey(t *testing.T) {
 	cache := &FieldCache{
-		FieldSchemas: []*mcp.ThreadFieldSchema{
+		FieldSchemas: []*plain.ThreadFieldSchema{
 			{ID: "field_1", Key: "priority", Label: "Priority"},
 			{ID: "field_2", Key: "customerType", Label: "Customer Type"},
 		},
@@ -190,7 +190,7 @@ func TestFieldCache_GetFieldSchemaByKey(t *testing.T) {
 
 func TestFieldCache_ResolveFieldIdentifier(t *testing.T) {
 	cache := &FieldCache{
-		FieldSchemas: []*mcp.ThreadFieldSchema{
+		FieldSchemas: []*plain.ThreadFieldSchema{
 			{ID: "threadFieldSchema_1", Key: "priority", Label: "Priority"},
 			{ID: "threadFieldSchema_2", Key: "customerType", Label: "Customer Type"},
 		},
@@ -246,7 +246,7 @@ func TestFieldCache_RoundTrip(t *testing.T) {
 	defer func() { GetCachePath = oldGetCachePath }()
 
 	// Create test field schemas
-	original := []*mcp.ThreadFieldSchema{
+	original := []*plain.ThreadFieldSchema{
 		{
 			ID:                  "field_1",
 			Key:                 "priority",

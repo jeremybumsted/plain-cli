@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/jeremybumsted/plain-cli/internal/cache"
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 	"github.com/jeremybumsted/plain-cli/internal/output"
 )
 
@@ -34,7 +34,7 @@ func (cmd *FieldListCmd) Run() error {
 	// Create formatter
 	formatter := getFormatter(cmd.Format)
 
-	var fieldSchemas []*mcp.ThreadFieldSchema
+	var fieldSchemas []*plain.ThreadFieldSchema
 	var needsRefresh bool
 
 	// Try to load cache if not forcing refresh

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 // FieldCache stores cached thread field schemas
 type FieldCache struct {
 	CacheMetadata
-	FieldSchemas []*mcp.ThreadFieldSchema `json:"field_schemas"`
+	FieldSchemas []*plain.ThreadFieldSchema `json:"field_schemas"`
 }
 
 // LoadFieldCache loads the field cache from disk
@@ -41,7 +41,7 @@ func LoadFieldCache() (*FieldCache, error) {
 
 // SaveFieldCache saves field schemas to the cache file
 // This creates a new cache with current timestamp and default TTL
-func SaveFieldCache(schemas []*mcp.ThreadFieldSchema) error {
+func SaveFieldCache(schemas []*plain.ThreadFieldSchema) error {
 	cache := &FieldCache{
 		CacheMetadata: CacheMetadata{
 			Version:   FieldCacheVersion,
@@ -66,7 +66,7 @@ func (c *FieldCache) IsFresh() bool {
 
 // GetFieldSchemaByID finds a field schema by ID in the cache
 // Returns nil if not found
-func (c *FieldCache) GetFieldSchemaByID(id string) *mcp.ThreadFieldSchema {
+func (c *FieldCache) GetFieldSchemaByID(id string) *plain.ThreadFieldSchema {
 	for _, fs := range c.FieldSchemas {
 		if fs.ID == id {
 			return fs
@@ -77,7 +77,7 @@ func (c *FieldCache) GetFieldSchemaByID(id string) *mcp.ThreadFieldSchema {
 
 // GetFieldSchemaByKey finds a field schema by key (case-insensitive) in the cache
 // Returns nil if not found
-func (c *FieldCache) GetFieldSchemaByKey(key string) *mcp.ThreadFieldSchema {
+func (c *FieldCache) GetFieldSchemaByKey(key string) *plain.ThreadFieldSchema {
 	lowerKey := strings.ToLower(key)
 	for _, fs := range c.FieldSchemas {
 		if strings.ToLower(fs.Key) == lowerKey {

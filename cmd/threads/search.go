@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // SearchCmd represents the threads search command
@@ -37,7 +37,7 @@ func (cmd *SearchCmd) Run() error {
 	formatter := getFormatter(cmd.Format)
 
 	// Build filters
-	filters := &mcp.ThreadFilters{
+	filters := &plain.ThreadFilters{
 		Status:   cmd.Status,
 		Priority: cmd.Priority,
 		Limit:    cmd.Limit,
@@ -117,7 +117,7 @@ func (cmd *SearchCmd) Run() error {
 		}
 
 		// Format priority
-		priority := mcp.FormatPriority(thread.Priority)
+		priority := plain.FormatPriority(thread.Priority)
 
 		// Format updated time
 		updatedTime, _ := thread.UpdatedAt.Time()

@@ -3,7 +3,7 @@ package threads
 import (
 	"fmt"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // MineCmd lists threads assigned to the authenticated user
@@ -86,7 +86,7 @@ func (cmd *MineCmd) Run() error {
 			thread.ID,
 			truncateString(thread.Title, 50),
 			thread.Status,
-			mcp.FormatPriority(thread.Priority),
+			plain.FormatPriority(thread.Priority),
 			updatedAt,
 		})
 	}

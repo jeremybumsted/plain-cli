@@ -3,7 +3,7 @@ package threads
 import (
 	"fmt"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // SnoozeCmd represents the threads snooze command
@@ -57,7 +57,7 @@ func (cmd *SnoozeCmd) Run() error {
 	thread, err := client.SnoozeThread(threadID, until)
 	if err != nil {
 		// Handle 404 gracefully
-		if mcpErr, ok := err.(*mcp.Error); ok && mcpErr.StatusCode == 404 {
+		if mcpErr, ok := err.(*plain.Error); ok && mcpErr.StatusCode == 404 {
 			return formatter.Error(fmt.Sprintf("Thread not found: %s", threadID))
 		}
 		return fmt.Errorf("failed to snooze thread: %w", err)

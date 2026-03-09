@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jeremybumsted/plain-cli/internal/cache"
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // LabelListCmd represents the threads label list command
@@ -24,7 +24,7 @@ func (cmd *LabelListCmd) Run() error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// 2. Get authenticated MCP client
+	// 2. Get authenticated Plain API client
 	client, err := getClient(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create client: %w", err)
@@ -34,7 +34,7 @@ func (cmd *LabelListCmd) Run() error {
 	formatter := getFormatter(cmd.Format)
 
 	// 4. Determine if we need to fetch from API
-	var labelTypes []*mcp.LabelType
+	var labelTypes []*plain.LabelType
 	needsRefresh := cmd.Refresh
 
 	// Try to load from cache if not forcing refresh
@@ -71,7 +71,7 @@ func (cmd *LabelListCmd) Run() error {
 
 	// 6. Filter archived labels if --archived not set
 	if !cmd.Archived {
-		filtered := make([]*mcp.LabelType, 0, len(labelTypes))
+		filtered := make([]*plain.LabelType, 0, len(labelTypes))
 		for _, lt := range labelTypes {
 			if !lt.IsArchived {
 				filtered = append(filtered, lt)
@@ -97,7 +97,7 @@ func (cmd *LabelListCmd) Run() error {
 }
 
 // printTable formats and prints label types as a table
-func (cmd *LabelListCmd) printTable(formatter interface{ PrintTable([]string, [][]string) error; Info(string) error }, labelTypes []*mcp.LabelType) error {
+func (cmd *LabelListCmd) printTable(formatter interface{ PrintTable([]string, [][]string) error; Info(string) error }, labelTypes []*plain.LabelType) error {
 	if len(labelTypes) == 0 {
 		return formatter.Info("No label types found")
 	}

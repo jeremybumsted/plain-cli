@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jeremybumsted/plain-cli/internal/mcp"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // ListCmd represents the list threads command
@@ -27,14 +27,14 @@ func (cmd *ListCmd) Run() error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// 2. Get authenticated MCP client
+	// 2. Get authenticated Plain API client
 	client, err := getClient(cfg)
 	if err != nil {
 		return fmt.Errorf("not authenticated: run 'plain auth login'")
 	}
 
 	// 3. Parse filters from flags
-	filters := &mcp.ThreadFilters{
+	filters := &plain.ThreadFilters{
 		Status:     cmd.Status,
 		AssigneeID: cmd.Assignee,
 		Priority:   cmd.Priority,
@@ -80,7 +80,7 @@ func (cmd *ListCmd) Run() error {
 }
 
 // printTable formats and prints threads as a table
-func (cmd *ListCmd) printTable(formatter interface{ PrintTable([]string, [][]string) error; Info(string) error }, response *mcp.ThreadsResponse) error {
+func (cmd *ListCmd) printTable(formatter interface{ PrintTable([]string, [][]string) error; Info(string) error }, response *plain.ThreadsResponse) error {
 	if len(response.Threads) == 0 {
 		return formatter.Info("No threads found")
 	}
@@ -98,7 +98,7 @@ func (cmd *ListCmd) printTable(formatter interface{ PrintTable([]string, [][]str
 			}
 		}
 
-		priority := mcp.FormatPriority(thread.Priority)
+		priority := plain.FormatPriority(thread.Priority)
 
 		// Format the title - truncate if too long
 		title := thread.Title
