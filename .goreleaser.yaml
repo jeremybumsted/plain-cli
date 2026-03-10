@@ -1,0 +1,86 @@
+version: 2
+
+before:
+  hooks:
+    # Ensure dependencies are up to date
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: plain
+    main: ./main.go
+    binary: plain
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Inject version information
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: plain
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
+
+# Optional: Homebrew tap configuration (uncomment if you want to publish to Homebrew)
+# brews:
+#   - repository:
+#       owner: jeremybumsted
+#       name: homebrew-tap
+#     directory: Formula
+#     homepage: https://github.com/jeremybumsted/plain-cli
+#     description: Plain support in the CLI - manage threads, customers, and more
+#     license: MIT
+#     install: |
+#       bin.install "plain"
+
+# Optional: Docker images (if you want to publish Docker images later)
+# dockers:
+#   - image_templates:
+#       - "ghcr.io/jeremybumsted/plain-cli:{{ .Version }}"
+#       - "ghcr.io/jeremybumsted/plain-cli:latest"
+#     dockerfile: Dockerfile
+#     use: buildx
+#     build_flag_templates:
+#       - "--platform=linux/amd64"
+#       - "--platform=linux/arm64"

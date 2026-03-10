@@ -1,0 +1,19 @@
+steps:
+  - label: ":golangci-lint: lint"
+    command: .buildkite/scripts/lint.sh
+    depends_on: start
+  - label: ":go: :test_tube: tests"
+    command: .buildkite/scripts/test.sh
+    depends_on: start
+  - label: ":terminal: :hammer: build {{matrix}}"
+    matrix:
+      - "darwin"
+      - "linux"
+      - "windows"
+    command: .buildkite/scripts/build.sh
+    artifact_paths:
+      - dist/**/*
+    env:
+      GOOS: "{{matrix}}"
+    depends_on: start
+

@@ -1,7 +1,8 @@
-# Agent documentation (work in progress tracking)
+u# Agent documentation (work in progress tracking)
 agentdoc/
 
 # Binaries
+dist/
 plain
 plain-cli
 *.exe

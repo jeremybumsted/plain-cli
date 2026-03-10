@@ -1,9 +1,17 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/alecthomas/kong"
 	"github.com/jeremybumsted/plain-cli/cmd/auth"
 	"github.com/jeremybumsted/plain-cli/cmd/threads"
+)
+
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 // CLI is the root command structure
@@ -25,9 +33,10 @@ type VersionCmd struct{}
 
 // Run executes the version command
 func (cmd *VersionCmd) Run() error {
-	// TODO: Add proper version from build flags
-	println("plain-cli version dev")
-	println("https://github.com/jeremybumsted/plain-cli")
+	fmt.Printf("plain-cli version %s\n", version)
+	fmt.Printf("commit: %s\n", commit)
+	fmt.Printf("built at: %s\n", date)
+	fmt.Println("https://github.com/jeremybumsted/plain-cli")
 	return nil
 }
 
