@@ -20,8 +20,6 @@ type ThreadsCmd struct {
 	Priority PriorityCmd `cmd:"" help:"Change thread priority"`
 	Label    LabelCmd    `cmd:"" help:"Manage thread labels"`
 	Field    FieldCmd    `cmd:"" help:"View thread field schemas"`
-	// Mine command disabled - requires OAuth user token (not machine user token)
-	// Mine   MineCmd   `cmd:"" help:"List threads assigned to you"`
 }
 
 // Helper functions for thread commands
