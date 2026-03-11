@@ -66,18 +66,34 @@ func displayThread(formatter interface{}, thread *plain.Thread, includeTimeline 
 	f := formatter.(Formatter)
 
 	// Display thread details
-	f.Print("Thread Details")
-	f.Print("--------------")
-	f.Printf("ID:          %s\n", thread.ID)
-	f.Printf("Title:       %s\n", thread.Title)
-	f.Printf("Status:      %s\n", thread.Status)
-	f.Printf("Priority:    %s\n", plain.FormatPriority(thread.Priority))
+	if err := f.Print("Thread Details"); err != nil {
+		return err
+	}
+	if err := f.Print("--------------"); err != nil {
+		return err
+	}
+	if err := f.Printf("ID:          %s\n", thread.ID); err != nil {
+		return err
+	}
+	if err := f.Printf("Title:       %s\n", thread.Title); err != nil {
+		return err
+	}
+	if err := f.Printf("Status:      %s\n", thread.Status); err != nil {
+		return err
+	}
+	if err := f.Printf("Priority:    %s\n", plain.FormatPriority(thread.Priority)); err != nil {
+		return err
+	}
 
 	// Display assignee
 	if thread.AssignedTo != nil {
-		f.Printf("Assignee:    %s (%s)\n", thread.AssignedTo.Email, thread.AssignedTo.FullName)
+		if err := f.Printf("Assignee:    %s (%s)\n", thread.AssignedTo.Email, thread.AssignedTo.FullName); err != nil {
+			return err
+		}
 	} else {
-		f.Printf("Assignee:    Unassigned\n")
+		if err := f.Printf("Assignee:    Unassigned\n"); err != nil {
+			return err
+		}
 	}
 
 	// Display labels
@@ -89,34 +105,52 @@ func displayThread(formatter interface{}, thread *plain.Thread, includeTimeline 
 			}
 		}
 		if len(labelNames) > 0 {
-			f.Printf("Labels:      %s\n", strings.Join(labelNames, ", "))
+			if err := f.Printf("Labels:      %s\n", strings.Join(labelNames, ", ")); err != nil {
+				return err
+			}
 		} else {
-			f.Printf("Labels:      None\n")
+			if err := f.Printf("Labels:      None\n"); err != nil {
+				return err
+			}
 		}
 	} else {
-		f.Printf("Labels:      None\n")
+		if err := f.Printf("Labels:      None\n"); err != nil {
+			return err
+		}
 	}
 
 	// Format timestamps
 	createdAt, _ := thread.CreatedAt.Time()
 	updatedAt, _ := thread.UpdatedAt.Time()
-	f.Printf("Created:     %s\n", createdAt.Format("2006-01-02 15:04:05"))
-	f.Printf("Updated:     %s\n", updatedAt.Format("2006-01-02 15:04:05"))
+	if err := f.Printf("Created:     %s\n", createdAt.Format("2006-01-02 15:04:05")); err != nil {
+		return err
+	}
+	if err := f.Printf("Updated:     %s\n", updatedAt.Format("2006-01-02 15:04:05")); err != nil {
+		return err
+	}
 
 	// Display description if present
 	if thread.Description != "" {
-		f.Print("Description:")
+		if err := f.Print("Description:"); err != nil {
+			return err
+		}
 		// Indent description
 		lines := strings.Split(thread.Description, "\n")
 		for _, line := range lines {
-			f.Printf("  %s\n", line)
+			if err := f.Printf("  %s\n", line); err != nil {
+				return err
+			}
 		}
 	}
 
 	// Display timeline if requested and available
 	if includeTimeline && thread.Timeline != nil && len(thread.Timeline.Entries) > 0 {
-		f.Print("\nTimeline")
-		f.Print("--------")
+		if err := f.Print("\nTimeline"); err != nil {
+			return err
+		}
+		if err := f.Print("--------"); err != nil {
+			return err
+		}
 		for _, entry := range thread.Timeline.Entries {
 			timestamp, _ := entry.Timestamp.Time()
 			timestampStr := timestamp.Format("2006-01-02 15:04:05")
@@ -126,7 +160,9 @@ func displayThread(formatter interface{}, thread *plain.Thread, includeTimeline 
 			}
 
 			entryType := entry.Entry.Type
-			f.Printf("%s - %s by %s\n", timestampStr, entryType, actorInfo)
+			if err := f.Printf("%s - %s by %s\n", timestampStr, entryType, actorInfo); err != nil {
+				return err
+			}
 
 			// Display entry content if available
 			content := ""
@@ -141,13 +177,17 @@ func displayThread(formatter interface{}, thread *plain.Thread, includeTimeline 
 				lines := strings.Split(content, "\n")
 				for i, line := range lines {
 					if i >= 3 {
-						f.Print("  ...")
+						if err := f.Print("  ..."); err != nil {
+							return err
+						}
 						break
 					}
 					if len(line) > 100 {
 						line = line[:97] + "..."
 					}
-					f.Printf("  %s\n", line)
+					if err := f.Printf("  %s\n", line); err != nil {
+						return err
+					}
 				}
 			}
 		}

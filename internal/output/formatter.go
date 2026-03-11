@@ -64,18 +64,18 @@ func (f *Formatter) PrintTable(headers []string, rows [][]string) error {
 	w := tabwriter.NewWriter(f.writer, 0, 0, 2, ' ', 0)
 
 	// Print headers
-	fmt.Fprintln(w, strings.Join(headers, "\t"))
+	_, _ = fmt.Fprintln(w, strings.Join(headers, "\t"))
 
 	// Print separator
 	separators := make([]string, len(headers))
 	for i := range separators {
 		separators[i] = strings.Repeat("-", len(headers[i]))
 	}
-	fmt.Fprintln(w, strings.Join(separators, "\t"))
+	_, _ = fmt.Fprintln(w, strings.Join(separators, "\t"))
 
 	// Print rows
 	for _, row := range rows {
-		fmt.Fprintln(w, strings.Join(row, "\t"))
+		_, _ = fmt.Fprintln(w, strings.Join(row, "\t"))
 	}
 
 	return w.Flush()
@@ -89,7 +89,7 @@ func (f *Formatter) PrintKeyValue(pairs map[string]string) error {
 
 	w := tabwriter.NewWriter(f.writer, 0, 0, 2, ' ', 0)
 	for key, value := range pairs {
-		fmt.Fprintf(w, "%s:\t%s\n", key, value)
+		_, _ = fmt.Fprintf(w, "%s:\t%s\n", key, value)
 	}
 	return w.Flush()
 }

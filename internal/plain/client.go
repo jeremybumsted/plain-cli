@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -85,7 +86,7 @@ func (c *Client) request(method, endpoint string, body interface{}, result inter
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Read response body
 	respBody, err := io.ReadAll(resp.Body)
@@ -324,8 +325,10 @@ func (c *Client) ListThreads(filters *ThreadFilters) (*ThreadsResponse, error) {
 		if filters.Priority != "" {
 			// Use "priorities" (plural) - priority values must be integers
 			// Convert string to int
-			priority := 0
-			fmt.Sscanf(filters.Priority, "%d", &priority)
+			priority, err := strconv.Atoi(filters.Priority)
+			if err != nil {
+				return nil, fmt.Errorf("invalid priority value '%s': must be an integer", filters.Priority)
+			}
 			if priority > 0 {
 				threadFilters["priorities"] = []int{priority}
 			}

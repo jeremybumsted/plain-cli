@@ -70,7 +70,9 @@ func (cmd *ListCmd) Run() error {
 			return nil
 		}
 		for _, thread := range response.Threads {
-			formatter.Print(thread.ID)
+			if err := formatter.Print(thread.ID); err != nil {
+				return err
+			}
 		}
 		return nil
 	default:

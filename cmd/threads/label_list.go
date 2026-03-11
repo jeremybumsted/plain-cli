@@ -87,7 +87,9 @@ func (cmd *LabelListCmd) Run() error {
 	case "quiet":
 		// Just IDs, one per line
 		for _, lt := range labelTypes {
-			formatter.Print(lt.ID)
+			if err := formatter.Print(lt.ID); err != nil {
+				return err
+			}
 		}
 		return nil
 	default:

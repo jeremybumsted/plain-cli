@@ -155,16 +155,16 @@ func openEditor(initialText string) (string, error) {
 		return "", fmt.Errorf("failed to create temp file: %w", err)
 	}
 	tmpPath := tmpFile.Name()
-	defer os.Remove(tmpPath)
+	defer func() { _ = os.Remove(tmpPath) }()
 
 	// Write initial text if provided
 	if initialText != "" {
 		if _, err := tmpFile.WriteString(initialText); err != nil {
-			tmpFile.Close()
+			_ = tmpFile.Close()
 			return "", fmt.Errorf("failed to write initial text: %w", err)
 		}
 	}
-	tmpFile.Close()
+	_ = tmpFile.Close()
 
 	// Open editor
 	cmd := exec.Command(editor, tmpPath)

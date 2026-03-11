@@ -56,7 +56,7 @@ func SaveCache(cachePath string, v interface{}) error {
 
 	// Atomically rename temp file to actual cache file
 	if err := os.Rename(tempPath, cachePath); err != nil {
-		os.Remove(tempPath) // Clean up temp file on error
+		_ = os.Remove(tempPath) // Clean up temp file on error
 		return fmt.Errorf("failed to save cache file: %w", err)
 	}
 

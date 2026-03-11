@@ -31,8 +31,12 @@ func (cmd *LoginCmd) Run() error {
 
 	token := cmd.Token
 	if token == "" {
-		formatter.Info("OAuth flow not yet implemented. Please provide an API token manually.")
-		formatter.Info("You can obtain a token from your Plain workspace settings.")
+		if err := formatter.Info("OAuth flow not yet implemented. Please provide an API token manually."); err != nil {
+			return err
+		}
+		if err := formatter.Info("You can obtain a token from your Plain workspace settings."); err != nil {
+			return err
+		}
 		fmt.Print("\nEnter your Plain API token: ")
 
 		reader := bufio.NewReader(os.Stdin)
@@ -54,7 +58,9 @@ func (cmd *LoginCmd) Run() error {
 	}
 
 	// Validate token by making a test request
-	formatter.Info("Validating token...")
+	if err := formatter.Info("Validating token..."); err != nil {
+		return err
+	}
 	client := plain.NewClient(token)
 
 	// TODO: Add a method to validate the token (e.g., GetCurrentUser)
@@ -71,10 +77,18 @@ func (cmd *LoginCmd) Run() error {
 		return fmt.Errorf("failed to save config: %w", err)
 	}
 
-	formatter.Success(fmt.Sprintf("Successfully authenticated! Config saved to %s", cfg.GetConfigPath()))
-	formatter.Info("\nNext steps:")
-	formatter.Info("  - Run 'plain auth status' to verify authentication")
-	formatter.Info("  - Run 'plain threads list' to view your threads")
+	if err := formatter.Success(fmt.Sprintf("Successfully authenticated! Config saved to %s", cfg.GetConfigPath())); err != nil {
+		return err
+	}
+	if err := formatter.Info("\nNext steps:"); err != nil {
+		return err
+	}
+	if err := formatter.Info("  - Run 'plain auth status' to verify authentication"); err != nil {
+		return err
+	}
+	if err := formatter.Info("  - Run 'plain threads list' to view your threads"); err != nil {
+		return err
+	}
 
 	return nil
 }

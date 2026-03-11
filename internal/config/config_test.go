@@ -9,7 +9,9 @@ import (
 
 func TestLoadNonExistentConfig(t *testing.T) {
 	// Ensure environment variable is not set
-	os.Unsetenv(EnvVarToken)
+	if err := os.Unsetenv(EnvVarToken); err != nil {
+		t.Fatalf("Failed to unset environment variable: %v", err)
+	}
 
 	// Create temp path that doesn't exist
 	tempDir := t.TempDir()
@@ -117,7 +119,9 @@ func TestIsAuthenticated(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Clear environment variable
-			os.Unsetenv(EnvVarToken)
+			if err := os.Unsetenv(EnvVarToken); err != nil {
+				t.Fatalf("Failed to unset environment variable: %v", err)
+			}
 
 			result := tt.config.IsAuthenticated()
 			if result != tt.expected {
@@ -130,8 +134,10 @@ func TestIsAuthenticated(t *testing.T) {
 func TestGetToken(t *testing.T) {
 	// Test with environment variable
 	t.Run("Environment variable override", func(t *testing.T) {
-		os.Setenv(EnvVarToken, "env-token")
-		defer os.Unsetenv(EnvVarToken)
+		if err := os.Setenv(EnvVarToken, "env-token"); err != nil {
+			t.Fatalf("Failed to set environment variable: %v", err)
+		}
+		defer func() { _ = os.Unsetenv(EnvVarToken) }()
 
 		config := &Config{
 			AccessToken: "config-token",
@@ -149,7 +155,9 @@ func TestGetToken(t *testing.T) {
 
 	// Test with config token
 	t.Run("Config token", func(t *testing.T) {
-		os.Unsetenv(EnvVarToken)
+		if err := os.Unsetenv(EnvVarToken); err != nil {
+			t.Fatalf("Failed to unset environment variable: %v", err)
+		}
 
 		config := &Config{
 			AccessToken: "config-token",
@@ -167,7 +175,9 @@ func TestGetToken(t *testing.T) {
 
 	// Test with no token
 	t.Run("No token", func(t *testing.T) {
-		os.Unsetenv(EnvVarToken)
+		if err := os.Unsetenv(EnvVarToken); err != nil {
+			t.Fatalf("Failed to unset environment variable: %v", err)
+		}
 
 		config := &Config{}
 
@@ -179,7 +189,9 @@ func TestGetToken(t *testing.T) {
 
 	// Test with expired token
 	t.Run("Expired token", func(t *testing.T) {
-		os.Unsetenv(EnvVarToken)
+		if err := os.Unsetenv(EnvVarToken); err != nil {
+			t.Fatalf("Failed to unset environment variable: %v", err)
+		}
 
 		config := &Config{
 			AccessToken: "expired-token",

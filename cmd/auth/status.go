@@ -26,28 +26,42 @@ func (cmd *StatusCmd) Run() error {
 	// Check environment variable override
 	envToken := os.Getenv(config.EnvVarToken)
 	if envToken != "" {
-		formatter.Info(fmt.Sprintf("✓ Authenticated via environment variable %s", config.EnvVarToken))
-		formatter.Info(fmt.Sprintf("  Token: %s...%s", envToken[:4], envToken[len(envToken)-4:]))
+		if err := formatter.Info(fmt.Sprintf("✓ Authenticated via environment variable %s", config.EnvVarToken)); err != nil {
+			return err
+		}
+		if err := formatter.Info(fmt.Sprintf("  Token: %s...%s", envToken[:4], envToken[len(envToken)-4:])); err != nil {
+			return err
+		}
 		return nil
 	}
 
 	// Check if authenticated
 	if !cfg.IsAuthenticated() {
-		formatter.Error("Not authenticated")
-		formatter.Info("\nTo authenticate, run:")
-		formatter.Info("  plain auth login")
+		if err := formatter.Error("Not authenticated"); err != nil {
+			return err
+		}
+		if err := formatter.Info("\nTo authenticate, run:"); err != nil {
+			return err
+		}
+		if err := formatter.Info("  plain auth login"); err != nil {
+			return err
+		}
 		return fmt.Errorf("not authenticated")
 	}
 
 	// Get token info
 	token, err := cfg.GetToken()
 	if err != nil {
-		formatter.Error(err.Error())
+		if fmtErr := formatter.Error(err.Error()); fmtErr != nil {
+			return fmtErr
+		}
 		return err
 	}
 
 	// Display status
-	formatter.Success("Authenticated")
+	if err := formatter.Success("Authenticated"); err != nil {
+		return err
+	}
 
 	// Show token preview (first 4 and last 4 characters)
 	tokenPreview := token
@@ -78,6 +92,8 @@ func (cmd *StatusCmd) Run() error {
 		return formatter.PrintJSON(data)
 	}
 
-	formatter.Info("")
+	if err := formatter.Info(""); err != nil {
+		return err
+	}
 	return formatter.PrintKeyValue(pairs)
 }

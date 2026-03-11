@@ -23,21 +23,21 @@ func (cmd *LogoutCmd) Run() error {
 
 	// Check if already logged out
 	if !cfg.IsAuthenticated() {
-		formatter.Info("Already logged out")
-		return nil
+		return formatter.Info("Already logged out")
 	}
 
 	// Confirm logout (unless -y flag is used)
 	if !cmd.Yes {
-		formatter.Warning("This will remove your stored credentials.")
+		if err := formatter.Warning("This will remove your stored credentials."); err != nil {
+			return err
+		}
 		fmt.Print("Continue? [y/N]: ")
 
 		var response string
-		fmt.Scanln(&response)
+		_, _ = fmt.Scanln(&response)
 
 		if response != "y" && response != "Y" && response != "yes" {
-			formatter.Info("Logout cancelled")
-			return nil
+			return formatter.Info("Logout cancelled")
 		}
 	}
 
@@ -49,9 +49,15 @@ func (cmd *LogoutCmd) Run() error {
 		return fmt.Errorf("failed to save config: %w", err)
 	}
 
-	formatter.Success("Successfully logged out")
-	formatter.Info("\nTo log back in, run:")
-	formatter.Info("  plain auth login")
+	if err := formatter.Success("Successfully logged out"); err != nil {
+		return err
+	}
+	if err := formatter.Info("\nTo log back in, run:"); err != nil {
+		return err
+	}
+	if err := formatter.Info("  plain auth login"); err != nil {
+		return err
+	}
 
 	return nil
 }

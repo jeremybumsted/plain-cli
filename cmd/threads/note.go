@@ -48,7 +48,7 @@ func (cmd *NoteCmd) Run() error {
 
 	// Validate that we have text
 	if noteText == "" {
-		return fmt.Errorf("Note text cannot be empty")
+		return fmt.Errorf("note text cannot be empty")
 	}
 
 	// Confirm action unless --yes flag is set
@@ -85,11 +85,19 @@ func (cmd *NoteCmd) Run() error {
 	timestamp, _ := note.CreatedAt.Time()
 	timestampStr := timestamp.Format("2006-01-02 15:04:05")
 
-	formatter.Print("Note added to thread")
-	formatter.Printf("ID:        %s\n", note.ID)
-	formatter.Printf("Created:   %s\n", timestampStr)
+	if err := formatter.Print("Note added to thread"); err != nil {
+		return err
+	}
+	if err := formatter.Printf("ID:        %s\n", note.ID); err != nil {
+		return err
+	}
+	if err := formatter.Printf("Created:   %s\n", timestampStr); err != nil {
+		return err
+	}
 	if note.CreatedBy.Email != "" {
-		formatter.Printf("Author:    %s\n", note.CreatedBy.Email)
+		if err := formatter.Printf("Author:    %s\n", note.CreatedBy.Email); err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -66,7 +66,9 @@ func (cmd *SearchCmd) Run() error {
 
 	// Display search header (unless in quiet mode)
 	if !formatter.IsQuiet() {
-		formatter.Info(fmt.Sprintf("Search results for: \"%s\"\n", cmd.Query))
+		if err := formatter.Info(fmt.Sprintf("Search results for: \"%s\"\n", cmd.Query)); err != nil {
+			return err
+		}
 	}
 
 	// Handle JSON output
@@ -82,7 +84,9 @@ func (cmd *SearchCmd) Run() error {
 	// Handle quiet mode - just print thread IDs
 	if formatter.IsQuiet() {
 		for _, thread := range response.Threads {
-			formatter.Print(thread.ID)
+			if err := formatter.Print(thread.ID); err != nil {
+				return err
+			}
 		}
 		return nil
 	}
@@ -143,10 +147,7 @@ func (cmd *SearchCmd) Run() error {
 	// Print summary
 	resultCount := len(response.Threads)
 	if response.Total > resultCount {
-		formatter.Info(fmt.Sprintf("\nShowing %d of %d results", resultCount, response.Total))
-	} else {
-		formatter.Info(fmt.Sprintf("\n%d result(s) found", resultCount))
+		return formatter.Info(fmt.Sprintf("\nShowing %d of %d results", resultCount, response.Total))
 	}
-
-	return nil
+	return formatter.Info(fmt.Sprintf("\n%d result(s) found", resultCount))
 }
