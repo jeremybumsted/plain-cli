@@ -6,6 +6,9 @@ echo "--- Checking dependencies up to date"
 mise trust -y
 mise install
 
+echo "--- Downloading :go: modules"
+mise x -- go mod download
+
 echo "--- :golang: Building binary with goreleaser"
 
 # Set GOARCH if not already set (default to amd64)
