@@ -3,8 +3,8 @@ agentdoc/
 
 # Binaries
 dist/
-plain
-plain-cli
+/plain
+/plain-cli
 *.exe
 *.exe~
 *.dll
