@@ -21,7 +21,7 @@ The user has the `plain` CLI tool installed, which provides commands for:
 - Searching threads: `plain threads search <query>`
 - Listing threads: `plain threads list [--status] [--priority] [--assignee] [--label]`
 - Getting details: `plain threads get <thread-id> [--timeline]`
-- All commands support `--json` for structured output
+- All commands support `--format=json` for structured output (or global `-j`/`--json` flag)
 
 ## Your Mission
 
@@ -59,7 +59,7 @@ If `$ARGUMENTS` contains search terms or is empty:
 
 Run the search:
 ```bash
-plain threads search "$KEYWORDS" --json
+plain threads search "$KEYWORDS" --format=json
 ```
 
 Analyze the results:
@@ -86,7 +86,7 @@ For each thread to investigate (selected thread or top matches):
 
 1. **Get full details with timeline:**
    ```bash
-   plain threads get <thread-id> --timeline --json
+   plain threads get <thread-id> --timeline --format=json
    ```
 
 2. **Extract key information:**
@@ -160,11 +160,11 @@ The "login failure" issue appears to cluster around:
 
 ## Suggested Next Steps
 
-1. Check for similar mobile-related issues:
-   `plain threads list --label=mobile --status=TODO`
+1. Check for similar mobile-related issues (use label ID from `plain threads label list`):
+   `plain threads list --label=<label-id> --status=TODO`
 
 2. Review recent high-priority auth issues:
-   `plain threads search "authentication" --priority=3`
+   `plain threads search "authentication" --priority=2`
 ```
 
 ### Step 6: Follow-up Options
@@ -186,8 +186,8 @@ Ask the user if they'd like to:
 ## Error Handling
 
 If the `plain` CLI is not authenticated:
-- Explain: "You need to authenticate first with: `plain auth login`"
-- Offer to run it for them if they provide a token
+- Explain: "You need to configure authentication first with: `plain config`"
+- This opens an interactive setup wizard to enter your API token (generate one at https://app.plain.com/developer/api-keys)
 
 If no threads are found:
 - Suggest broader search terms
@@ -200,11 +200,13 @@ If thread doesn't exist:
 
 ## Technical Notes
 
-- All `plain` commands support `--json` for structured parsing
+- All `plain` commands support `--format=json` for structured parsing (or global `-j`/`--json`)
 - Thread IDs start with `thread_`
 - Use `--timeline` flag to get full activity history
 - Status values: TODO, DONE, SNOOZED
-- Priority values: 0 (low), 1 (normal), 2 (high), 3 (urgent)
+- Priority values: 0/low, 1/normal, 2/high, 3/urgent (named values also accepted)
+- `--label` filter takes label IDs (comma-separated); use `plain threads label list` to find IDs
+- Authentication is configured via `plain config` (interactive setup wizard)
 
 ## Example Invocations
 
