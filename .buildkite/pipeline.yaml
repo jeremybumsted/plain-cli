@@ -24,6 +24,8 @@ steps:
     key: release-blocker
   - label: ":rocket: :github: release"
     command: .buildkite/scripts/release.sh
+    secrets:
+      GITHUB_TOKEN: GITHUB_API_TOKEN
     if: build.tag != null
     depends_on: release-blocker
 
