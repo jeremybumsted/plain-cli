@@ -25,17 +25,10 @@ echo "Building for GOOS=$GOOS GOARCH=$GOARCH"
 # Determine build mode based on tag presence
 if [ -n "${BUILDKITE_TAG:-}" ]; then
   echo "Building for tag release: $BUILDKITE_TAG"
-  BUILD_MODE="release"
+  echo "Running goreleaser build (single-target)"
+  mise x -- goreleaser build --clean --single-target
 else
   echo "CI build - snapshot mode"
-  BUILD_MODE="snapshot"
-fi
-
-# Run goreleaser with single-target flag
-if [ "$BUILD_MODE" = "release" ]; then
-  echo "Running goreleaser release (single-target)"
-  mise x -- goreleaser release --clean --single-target
-else
   echo "Running goreleaser build (snapshot, single-target)"
   mise x -- goreleaser build --snapshot --clean --single-target
 fi
