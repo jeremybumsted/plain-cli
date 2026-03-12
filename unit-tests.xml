@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="194" failures="0" errors="0" time="1.030487">
-	<testsuite tests="0" failures="0" time="0.385000" name="github.com/jeremybumsted/plain-cli" timestamp="2026-03-11T23:17:43-06:00">
+<testsuites tests="194" failures="0" errors="0" time="0.478340">
+	<testsuite tests="0" failures="0" time="0.270000" name="github.com/jeremybumsted/plain-cli" timestamp="2026-03-11T23:24:22-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.000000" name="github.com/jeremybumsted/plain-cli/cmd" timestamp="2026-03-11T23:17:43-06:00">
+	<testsuite tests="0" failures="0" time="0.000000" name="github.com/jeremybumsted/plain-cli/cmd" timestamp="2026-03-11T23:24:22-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.399000" name="github.com/jeremybumsted/plain-cli/cmd/articles" timestamp="2026-03-11T23:17:43-06:00">
+	<testsuite tests="0" failures="0" time="0.269000" name="github.com/jeremybumsted/plain-cli/cmd/articles" timestamp="2026-03-11T23:24:22-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.416000" name="github.com/jeremybumsted/plain-cli/cmd/auth" timestamp="2026-03-11T23:17:43-06:00">
-		<properties>
-			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
-		</properties>
-	</testsuite>
-	<testsuite tests="17" failures="0" time="0.390000" name="github.com/jeremybumsted/plain-cli/cmd/config" timestamp="2026-03-11T23:17:44-06:00">
+	<testsuite tests="17" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/cmd/config" timestamp="2026-03-11T23:24:22-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
@@ -42,7 +37,7 @@
 		<testcase classname="cmd/config" name="TestRunConfigMenuWithReader_WhitespaceInSelection" time="0.000000"></testcase>
 		<testcase classname="cmd/config" name="TestConfigCmd_ConfigPath_Persistence" time="0.000000"></testcase>
 	</testsuite>
-	<testsuite tests="53" failures="0" time="0.005000" name="github.com/jeremybumsted/plain-cli/cmd/threads" timestamp="2026-03-11T23:17:44-06:00">
+	<testsuite tests="53" failures="0" time="0.002000" name="github.com/jeremybumsted/plain-cli/cmd/threads" timestamp="2026-03-11T23:24:23-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
@@ -100,7 +95,7 @@
 		<testcase classname="cmd/threads" name="TestOpenEditorNoEditorSet/editor_not_set_doesn&#39;t_panic" time="0.000000"></testcase>
 		<testcase classname="cmd/threads" name="TestOpenEditorNoEditorSet" time="0.000000"></testcase>
 	</testsuite>
-	<testsuite tests="60" failures="0" time="0.006000" name="github.com/jeremybumsted/plain-cli/internal/cache" timestamp="2026-03-11T23:17:44-06:00">
+	<testsuite tests="60" failures="0" time="0.004000" name="github.com/jeremybumsted/plain-cli/internal/cache" timestamp="2026-03-11T23:24:23-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
@@ -165,7 +160,7 @@
 		<testcase classname="internal/cache" name="TestLabelCache_GetLabelNames" time="0.000000"></testcase>
 		<testcase classname="internal/cache" name="TestLabelCache_RoundTrip" time="0.000000"></testcase>
 	</testsuite>
-	<testsuite tests="32" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/internal/config" timestamp="2026-03-11T23:17:44-06:00">
+	<testsuite tests="32" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/internal/config" timestamp="2026-03-11T23:24:23-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
@@ -202,7 +197,7 @@
 		<testcase classname="internal/config" name="TestIsFullyConfigured/Config_values_with_env_var_overrides" time="0.000000"></testcase>
 		<testcase classname="internal/config" name="TestIsFullyConfigured" time="0.000000"></testcase>
 	</testsuite>
-	<testsuite tests="14" failures="0" time="0.002000" name="github.com/jeremybumsted/plain-cli/internal/output" timestamp="2026-03-11T23:17:44-06:00">
+	<testsuite tests="14" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/internal/output" timestamp="2026-03-11T23:24:23-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>
@@ -221,7 +216,7 @@
 		<testcase classname="internal/output" name="TestPrint" time="0.000000"></testcase>
 		<testcase classname="internal/output" name="TestPrintf" time="0.000000"></testcase>
 	</testsuite>
-	<testsuite tests="18" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/internal/plain" timestamp="2026-03-11T23:17:44-06:00">
+	<testsuite tests="18" failures="0" time="0.000000" name="github.com/jeremybumsted/plain-cli/internal/plain" timestamp="2026-03-11T23:24:23-06:00">
 		<properties>
 			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
 		</properties>

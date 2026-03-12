@@ -5,7 +5,6 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/jeremybumsted/plain-cli/cmd/articles"
-	"github.com/jeremybumsted/plain-cli/cmd/auth"
 	"github.com/jeremybumsted/plain-cli/cmd/config"
 	"github.com/jeremybumsted/plain-cli/cmd/threads"
 )
@@ -18,7 +17,6 @@ var (
 
 // CLI is the root command structure
 type CLI struct {
-	Auth     auth.AuthCmd       `cmd:"" help:"Authentication commands"`
 	Threads  threads.ThreadsCmd `cmd:"" help:"Manage support threads"`
 	Articles articles.ArticlesCmd `cmd:"" help:"Manage help center articles"`
 	Config   config.ConfigCmd   `cmd:"" help:"Configure Plain CLI"`
