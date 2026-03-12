@@ -18,7 +18,7 @@ steps:
     depends_on: start
   - block: "Create a new release?"
     if: build.tag != null
-    depend_on:
+    depends_on:
       - lint
       - tests
     key: release-blocker
