@@ -16,4 +16,10 @@ steps:
     env:
       GOOS: "{{matrix}}"
     depends_on: start
+  - label: ":rocket: :github: release"
+    command: .buildkite/scripts/release.sh
+    if: build.tag != null
+    depends_on:
+      - lint
+      - tests
 

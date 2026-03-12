@@ -256,6 +256,21 @@ Check your installed version:
 plain version
 ```
 
+## Releases
+
+New releases are automatically created when a git tag is pushed. The release process:
+
+1. Tag a new version: `git tag v1.0.0`
+2. Push the tag: `git push origin v1.0.0`
+3. Buildkite automatically builds binaries for all platforms and creates a GitHub release
+
+Download the latest release from [GitHub Releases](https://github.com/jeremybumsted/plain-cli/releases).
+
+Binary archives are provided for:
+- **Linux**: amd64, arm64
+- **macOS**: amd64 (Intel), arm64 (Apple Silicon)
+- **Windows**: amd64, arm64
+
 ## License
 
 See LICENSE file for details.
