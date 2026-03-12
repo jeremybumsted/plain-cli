@@ -16,11 +16,11 @@ steps:
     env:
       GOOS: "{{matrix}}"
     depends_on: start
+    key: build
   - block: "Create a new release?"
     if: build.tag != null
     depends_on:
-      - lint
-      - tests
+      - build
     key: release-blocker
   - label: ":rocket: :github: release"
     command: .buildkite/scripts/release.sh
