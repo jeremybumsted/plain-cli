@@ -183,6 +183,11 @@ func (c *Config) GetConfigPath() string {
 	return c.configPath
 }
 
+// SetConfigPath sets the config file path (useful for testing)
+func (c *Config) SetConfigPath(path string) {
+	c.configPath = path
+}
+
 // GetHelpCenterID returns the configured help center ID, checking env var first
 func (c *Config) GetHelpCenterID() (string, error) {
 	// Environment variable takes precedence

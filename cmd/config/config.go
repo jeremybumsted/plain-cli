@@ -1,7 +1,11 @@
 package config
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"os"
+	"strings"
 
 	"github.com/jeremybumsted/plain-cli/internal/config"
 	"github.com/jeremybumsted/plain-cli/internal/plain"
@@ -36,8 +40,8 @@ func (cmd *ConfigCmd) Run() error {
 		return runFirstTimeSetup(cfg)
 	}
 
-	// Show current config (default behavior)
-	return (&ShowCmd{}).Run()
+	// Show interactive config menu
+	return runConfigMenu(cfg)
 }
 
 // Helper functions
@@ -54,6 +58,10 @@ func getClient(cfg *config.Config) (*plain.Client, error) {
 }
 
 func runConfigMenu(cfg *config.Config) error {
+	return runConfigMenuWithReader(cfg, os.Stdin)
+}
+
+func runConfigMenuWithReader(cfg *config.Config, reader io.Reader) error {
 	fmt.Println("Plain CLI Configuration")
 	fmt.Println()
 
@@ -68,11 +76,17 @@ func runConfigMenu(cfg *config.Config) error {
 	fmt.Println("  0. Exit")
 	fmt.Println()
 
-	var selection string
 	fmt.Print("Select option [0-4]: ")
-	if _, err := fmt.Scanln(&selection); err != nil {
-		return fmt.Errorf("failed to read input: %w", err)
+
+	scanner := bufio.NewScanner(reader)
+	if !scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return fmt.Errorf("failed to read input: %w", err)
+		}
+		return fmt.Errorf("no input provided")
 	}
+
+	selection := strings.TrimSpace(scanner.Text())
 
 	switch selection {
 	case "1":
