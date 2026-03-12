@@ -160,8 +160,8 @@ The "login failure" issue appears to cluster around:
 
 ## Suggested Next Steps
 
-1. Check for similar mobile-related issues (use label ID from `plain threads label list`):
-   `plain threads list --label=<label-id> --status=TODO`
+1. Check for similar mobile-related issues (use `labelType.id` from the thread's JSON labels array):
+   `plain threads list --label=<labeltype-id> --status=TODO`
 
 2. Review recent high-priority auth issues:
    `plain threads search "authentication" --priority=2`
@@ -205,7 +205,7 @@ If thread doesn't exist:
 - Use `--timeline` flag to get full activity history
 - Status values: TODO, DONE, SNOOZED
 - Priority values: 0/low, 1/normal, 2/high, 3/urgent (named values also accepted)
-- `--label` filter takes label IDs (comma-separated); use `plain threads label list` to find IDs
+- `--label` filter takes label type IDs (comma-separated); extract `labelType.id` from thread JSON response labels, or use `plain threads label list` to browse all available labels
 - Authentication is configured via `plain config` (interactive setup wizard)
 
 ## Example Invocations
