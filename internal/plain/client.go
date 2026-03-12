@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -188,6 +189,44 @@ type User struct {
 	FullName string `json:"fullName"`
 }
 
+// Attachment represents a file attachment
+type Attachment struct {
+	ID            string   `json:"id"`
+	FileName      string   `json:"fileName"`
+	FileSize      FileSize `json:"fileSize"`
+	FileExtension string   `json:"fileExtension,omitempty"`
+	FileMimeType  string   `json:"fileMimeType"`
+	Type          string   `json:"type"`
+	CreatedAt     DateTime `json:"createdAt"`
+}
+
+// FileSize represents file size information
+type FileSize struct {
+	Bytes int64 `json:"bytes"`
+}
+
+// AttachmentDownloadURL represents a temporary download URL for an attachment
+type AttachmentDownloadURL struct {
+	Attachment  Attachment `json:"attachment"`
+	DownloadURL string     `json:"downloadUrl"`
+	ExpiresAt   DateTime   `json:"expiresAt"`
+}
+
+// Actor represents an actor in timeline entries (union type)
+type Actor struct {
+	Typename string `json:"__typename"`
+	// UserActor fields
+	UserID   string `json:"userId,omitempty"`
+	Email    string `json:"email,omitempty"`
+	FullName string `json:"fullName,omitempty"`
+	// CustomerActor fields
+	CustomerID string `json:"customerId,omitempty"`
+	// SystemActor fields
+	SystemID string `json:"systemId,omitempty"`
+	// MachineUserActor fields
+	MachineUserID string `json:"machineUserId,omitempty"`
+}
+
 // ThreadFieldSchema represents a custom field schema for threads
 type ThreadFieldSchema struct {
 	ID                  string   `json:"id"`
@@ -237,17 +276,141 @@ type Timeline struct {
 type TimelineEntry struct {
 	ID        string    `json:"id"`
 	Timestamp DateTime  `json:"timestamp"`
-	Actor     *User     `json:"actor,omitempty"`
+	Actor     Actor     `json:"actor"`
 	Entry     EntryData `json:"entry"`
 }
 
-// EntryData represents the polymorphic entry data
-// This is a simplified representation - in a full implementation,
-// you would handle the union type properly
+// EntryData represents a timeline entry (union type)
 type EntryData struct {
-	Type    string `json:"__typename"`
-	Content string `json:"content,omitempty"`
-	Text    string `json:"text,omitempty"`
+	Typename string `json:"__typename"`
+
+	// NoteEntry fields
+	NoteID      string       `json:"noteId,omitempty"`
+	NoteText    string       `json:"noteText,omitempty"`
+	Text        string       `json:"text,omitempty"` // fallback for compatibility
+	Markdown    string       `json:"markdown,omitempty"`
+	IsEdited    bool         `json:"isEdited,omitempty"`
+
+	// ChatEntry fields
+	ChatID         string    `json:"chatId,omitempty"`
+	ChatText       string    `json:"chatText,omitempty"`
+	CustomerReadAt *DateTime `json:"customerReadAt,omitempty"`
+
+	// EmailEntry fields
+	EmailID         string            `json:"emailId,omitempty"`
+	Subject         string            `json:"subject,omitempty"`
+	MarkdownContent string            `json:"markdownContent,omitempty"`
+	From            *EmailParticipant `json:"from,omitempty"`
+	To              *EmailParticipant `json:"to,omitempty"`
+
+	// Status/Assignment change fields
+	PreviousStatus   string          `json:"previousStatus,omitempty"`
+	NextStatus       string          `json:"nextStatus,omitempty"`
+	PreviousAssignee *ThreadAssignee `json:"previousAssignee,omitempty"`
+	NextAssignee     *ThreadAssignee `json:"nextAssignee,omitempty"`
+	PreviousPriority *int            `json:"previousPriority,omitempty"`
+	NextPriority     *int            `json:"nextPriority,omitempty"`
+
+	// SlackMessageEntry fields
+	SlackText           string `json:"slackText,omitempty"`
+	SlackWebMessageLink string `json:"slackWebMessageLink,omitempty"`
+
+	// SlackReplyEntry fields
+	SlackReplyText string `json:"slackReplyText,omitempty"`
+
+	// ThreadDiscussionMessageEntry fields
+	DiscussionText string `json:"discussionText,omitempty"`
+
+	// ThreadDiscussionResolvedEntry fields
+	ResolvedAt *DateTime `json:"resolvedAt,omitempty"`
+
+	// ThreadDiscussionEntry fields
+	DiscussionType string `json:"discussionType,omitempty"`
+
+	// ThreadLabelsChangedEntry fields
+	AddedLabelTypes   []LabelType `json:"addedLabelTypes,omitempty"`
+	RemovedLabelTypes []LabelType `json:"removedLabelTypes,omitempty"`
+
+	// ThreadAdditionalAssigneesTransitionedEntry fields
+	NextAssignees     []ThreadAssignee `json:"nextAssignees,omitempty"`
+	PreviousAssignees []ThreadAssignee `json:"previousAssignees,omitempty"`
+
+	// ThreadLinkCreatedEntry fields
+	Thread *struct {
+		ID    string `json:"id,omitempty"`
+		Title string `json:"title,omitempty"`
+	} `json:"thread,omitempty"`
+
+	// CustomEntry fields
+	Title string `json:"title,omitempty"`
+	Type  string `json:"type,omitempty"`
+
+	// Common fields
+	Attachments []Attachment `json:"attachments,omitempty"`
+}
+
+// EmailParticipant represents an email participant
+type EmailParticipant struct {
+	Email string `json:"email"`
+	Name  string `json:"name,omitempty"`
+}
+
+// ThreadAssignee represents a thread assignee (union type)
+type ThreadAssignee struct {
+	Typename string `json:"__typename"`
+	ID       string `json:"id,omitempty"`
+	Email    string `json:"email,omitempty"`
+	FullName string `json:"fullName,omitempty"`
+}
+
+// GetEntryDisplayText returns a human-readable description of the entry
+func (e *EntryData) GetEntryDisplayText() string {
+	switch e.Typename {
+	case "NoteEntry":
+		return "Note"
+	case "ChatEntry":
+		return "Chat message"
+	case "EmailEntry":
+		return "Email"
+	case "ThreadStatusTransitionedEntry":
+		return "Status changed"
+	case "ThreadAssignmentTransitionedEntry":
+		return "Assignment changed"
+	case "ThreadPriorityChangedEntry":
+		return "Priority changed"
+	case "SlackMessageEntry":
+		return "Slack message"
+	case "SlackReplyEntry":
+		return "Slack reply"
+	case "ThreadDiscussionMessageEntry":
+		return "Discussion message"
+	case "ThreadDiscussionResolvedEntry":
+		return "Marked discussion as resolved"
+	case "ThreadDiscussionEntry":
+		return "Discussion started"
+	case "ThreadLabelsChangedEntry":
+		return "Labels changed"
+	case "ThreadAdditionalAssigneesTransitionedEntry":
+		return "Additional assignees changed"
+	case "ThreadLinkCreatedEntry":
+		return "Thread linked"
+	default:
+		return e.Typename
+	}
+}
+
+// GetActorDisplayName returns the actor's display name
+func (a *Actor) GetActorDisplayName() string {
+	if a.FullName != "" {
+		return a.FullName
+	}
+	if a.Email != "" {
+		return a.Email
+	}
+	if a.Typename == "SystemActor" {
+		return "System"
+	}
+	return "Unknown"
 }
 
 // Note represents an internal note on a thread
@@ -443,7 +606,7 @@ func (c *Client) ListThreads(filters *ThreadFilters) (*ThreadsResponse, error) {
 // GetThread fetches details for a specific thread
 func (c *Client) GetThread(threadID string, includeTimeline bool) (*Thread, error) {
 	query := `
-		query GetThread($threadId: ID!) {
+		query GetThread($threadId: ID!, $includeTimeline: Boolean!) {
 			thread(threadId: $threadId) {
 				id
 				title
@@ -474,12 +637,266 @@ func (c *Client) GetThread(threadID string, includeTimeline bool) (*Thread, erro
 				updatedAt {
 					iso8601
 				}
+				timelineEntries(first: 50) @include(if: $includeTimeline) {
+					edges {
+						node {
+							id
+							timestamp {
+								iso8601
+							}
+							actor {
+								__typename
+								... on UserActor {
+									userId
+									user {
+										id
+										fullName
+									}
+								}
+								... on CustomerActor {
+									customerId
+									customer {
+										id
+										fullName
+									}
+								}
+								... on DeletedCustomerActor {
+									customerId
+								}
+								... on SystemActor {
+									systemId
+								}
+								... on MachineUserActor {
+									machineUserId
+									machineUser {
+										id
+										fullName
+									}
+								}
+							}
+							entry {
+								__typename
+								... on NoteEntry {
+									noteId
+									noteText: text
+									markdown
+									isEdited
+									editedAt {
+										iso8601
+									}
+									attachments {
+										id
+										fileName
+										fileSize {
+											bytes
+										}
+										fileExtension
+										fileMimeType
+										type
+										createdAt {
+											iso8601
+										}
+									}
+								}
+								... on ChatEntry {
+									chatId
+									chatText: text
+									customerReadAt {
+										iso8601
+									}
+									attachments {
+										id
+										fileName
+										fileSize {
+											bytes
+										}
+										fileExtension
+										fileMimeType
+										type
+										createdAt {
+											iso8601
+										}
+									}
+								}
+								... on EmailEntry {
+									emailId
+									subject
+									textContent
+									markdownContent
+									from {
+										name
+										email
+									}
+									to {
+										name
+										email
+									}
+									additionalRecipients {
+										name
+										email
+									}
+									sentAt {
+										iso8601
+									}
+									receivedAt {
+										iso8601
+									}
+									attachments {
+										id
+										fileName
+										fileSize {
+											bytes
+										}
+										fileExtension
+										fileMimeType
+										type
+										createdAt {
+											iso8601
+										}
+									}
+								}
+								... on ThreadStatusTransitionedEntry {
+									previousStatus
+									nextStatus
+								}
+								... on ThreadAssignmentTransitionedEntry {
+									previousAssignee {
+										__typename
+										... on User {
+											id
+											email
+											fullName
+										}
+										... on MachineUser {
+											id
+											fullName
+										}
+									}
+									nextAssignee {
+										__typename
+										... on User {
+											id
+											email
+											fullName
+										}
+										... on MachineUser {
+											id
+											fullName
+										}
+									}
+								}
+								... on ThreadPriorityChangedEntry {
+									previousPriority
+									nextPriority
+								}
+								... on SlackMessageEntry {
+									slackText: text
+									slackWebMessageLink
+									lastEditedOnSlackAt {
+										iso8601
+									}
+									deletedOnSlackAt {
+										iso8601
+									}
+									attachments {
+										id
+										fileName
+										fileSize {
+											bytes
+										}
+										fileExtension
+										fileMimeType
+										type
+										createdAt {
+											iso8601
+										}
+									}
+								}
+								... on CustomEntry {
+									title
+									type
+									externalId
+									attachments {
+										id
+										fileName
+										fileSize {
+											bytes
+										}
+										fileExtension
+										fileMimeType
+										type
+										createdAt {
+											iso8601
+										}
+									}
+								}
+								... on SlackReplyEntry {
+									slackReplyText: text
+									slackWebMessageLink
+									attachments {
+										id
+										fileName
+										fileSize {
+											bytes
+										}
+										fileExtension
+										fileMimeType
+										type
+										createdAt {
+											iso8601
+										}
+									}
+								}
+								... on ThreadDiscussionMessageEntry {
+									discussionText: text
+								}
+								... on ThreadDiscussionResolvedEntry {
+									__typename
+								}
+								... on ThreadDiscussionEntry {
+									__typename
+								}
+								... on ThreadLabelsChangedEntry {
+									__typename
+								}
+								... on ThreadAdditionalAssigneesTransitionedEntry {
+									nextAssignees {
+										__typename
+										... on User {
+											id
+											fullName
+										}
+										... on MachineUser {
+											id
+											fullName
+										}
+									}
+									previousAssignees {
+										__typename
+										... on User {
+											id
+											fullName
+										}
+										... on MachineUser {
+											id
+											fullName
+										}
+									}
+								}
+								... on ThreadLinkCreatedEntry {
+									__typename
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	`
 
 	variables := map[string]interface{}{
-		"threadId": threadID,
+		"threadId":        threadID,
+		"includeTimeline": includeTimeline,
 	}
 
 	reqBody := map[string]interface{}{
@@ -499,6 +916,38 @@ func (c *Client) GetThread(threadID string, includeTimeline bool) (*Thread, erro
 				Labels      []Label  `json:"labels"`
 				CreatedAt   DateTime `json:"createdAt"`
 				UpdatedAt   DateTime `json:"updatedAt"`
+				TimelineEntries *struct {
+					Edges []struct {
+						Node struct {
+							ID        string    `json:"id"`
+							Timestamp DateTime  `json:"timestamp"`
+							Actor     struct {
+								Typename string `json:"__typename"`
+								// UserActor fields
+								UserID string `json:"userId,omitempty"`
+								User   *struct {
+									ID       string `json:"id,omitempty"`
+									FullName string `json:"fullName,omitempty"`
+								} `json:"user,omitempty"`
+								// CustomerActor fields
+								CustomerID string `json:"customerId,omitempty"`
+								Customer   *struct {
+									ID       string `json:"id,omitempty"`
+									FullName string `json:"fullName,omitempty"`
+								} `json:"customer,omitempty"`
+								// SystemActor fields
+								SystemID string `json:"systemId,omitempty"`
+								// MachineUserActor fields
+								MachineUserID string `json:"machineUserId,omitempty"`
+								MachineUser   *struct {
+									ID       string `json:"id,omitempty"`
+									FullName string `json:"fullName,omitempty"`
+								} `json:"machineUser,omitempty"`
+							} `json:"actor"`
+							Entry EntryData `json:"entry"`
+						} `json:"node"`
+					} `json:"edges"`
+				} `json:"timelineEntries,omitempty"`
 			} `json:"thread"`
 		} `json:"data"`
 		Errors []struct {
@@ -533,6 +982,50 @@ func (c *Client) GetThread(threadID string, includeTimeline bool) (*Thread, erro
 		Labels:      response.Data.Thread.Labels,
 		CreatedAt:   response.Data.Thread.CreatedAt,
 		UpdatedAt:   response.Data.Thread.UpdatedAt,
+	}
+
+	// Convert timeline entries if they were fetched
+	if response.Data.Thread.TimelineEntries != nil {
+		entries := make([]TimelineEntry, 0, len(response.Data.Thread.TimelineEntries.Edges))
+		for _, edge := range response.Data.Thread.TimelineEntries.Edges {
+			// Flatten the actor structure
+			actor := Actor{
+				Typename: edge.Node.Actor.Typename,
+			}
+
+			// Map UserActor fields
+			if edge.Node.Actor.User != nil {
+				actor.UserID = edge.Node.Actor.UserID
+				actor.FullName = edge.Node.Actor.User.FullName
+			}
+
+			// Map CustomerActor fields
+			if edge.Node.Actor.Customer != nil {
+				actor.CustomerID = edge.Node.Actor.CustomerID
+				actor.FullName = edge.Node.Actor.Customer.FullName
+			}
+
+			// Map SystemActor fields
+			if edge.Node.Actor.SystemID != "" {
+				actor.SystemID = edge.Node.Actor.SystemID
+			}
+
+			// Map MachineUserActor fields
+			if edge.Node.Actor.MachineUser != nil {
+				actor.MachineUserID = edge.Node.Actor.MachineUserID
+				actor.FullName = edge.Node.Actor.MachineUser.FullName
+			}
+
+			entries = append(entries, TimelineEntry{
+				ID:        edge.Node.ID,
+				Timestamp: edge.Node.Timestamp,
+				Actor:     actor,
+				Entry:     edge.Node.Entry,
+			})
+		}
+		thread.Timeline = &Timeline{
+			Entries: entries,
+		}
 	}
 
 	return thread, nil
@@ -1428,4 +1921,118 @@ func (c *Client) ListHelpCenterArticles(helpCenterID string, includeContent bool
 	}
 
 	return allArticles, nil
+}
+
+// CreateAttachmentDownloadUrl creates a temporary download URL for an attachment
+func (c *Client) CreateAttachmentDownloadUrl(attachmentID string) (*AttachmentDownloadURL, error) {
+	mutation := `
+		mutation CreateAttachmentDownloadUrl($attachmentId: ID!) {
+			createAttachmentDownloadUrl(input: { attachmentId: $attachmentId }) {
+				attachmentDownloadUrl {
+					attachment {
+						id
+						fileName
+						fileSize {
+							bytes
+						}
+						fileExtension
+						fileMimeType
+						type
+						createdAt {
+							iso8601
+						}
+					}
+					downloadUrl
+					expiresAt {
+						iso8601
+					}
+				}
+				error {
+					message
+					code
+				}
+			}
+		}
+	`
+
+	variables := map[string]interface{}{
+		"attachmentId": attachmentID,
+	}
+
+	var result struct {
+		Data struct {
+			CreateAttachmentDownloadUrl struct {
+				AttachmentDownloadUrl *AttachmentDownloadURL `json:"attachmentDownloadUrl"`
+				Error                 *struct {
+					Message string `json:"message"`
+					Code    string `json:"code"`
+				} `json:"error"`
+			} `json:"createAttachmentDownloadUrl"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	if err := c.graphql(mutation, variables, &result); err != nil {
+		return nil, err
+	}
+
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+	}
+
+	if result.Data.CreateAttachmentDownloadUrl.Error != nil {
+		return nil, fmt.Errorf("%s", result.Data.CreateAttachmentDownloadUrl.Error.Message)
+	}
+
+	if result.Data.CreateAttachmentDownloadUrl.AttachmentDownloadUrl == nil {
+		return nil, &Error{
+			StatusCode: 404,
+			Message:    fmt.Sprintf("Attachment not found: %s", attachmentID),
+		}
+	}
+
+	return result.Data.CreateAttachmentDownloadUrl.AttachmentDownloadUrl, nil
+}
+
+// DownloadAttachment downloads an attachment to the specified path
+func (c *Client) DownloadAttachment(attachmentID, outputPath string) error {
+	// Get download URL
+	downloadInfo, err := c.CreateAttachmentDownloadUrl(attachmentID)
+	if err != nil {
+		return fmt.Errorf("failed to get download URL: %w", err)
+	}
+
+	// Create HTTP request
+	req, err := http.NewRequest("GET", downloadInfo.DownloadURL, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Make request
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to download: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("download failed with status: %d", resp.StatusCode)
+	}
+
+	// Create output file
+	outFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer func() { _ = outFile.Close() }()
+
+	// Copy response body to file
+	_, err = io.Copy(outFile, resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+
+	return nil
 }
