@@ -543,3 +543,16 @@ func TestListWorkspaces_Error(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateAttachmentDownloadUrl(t *testing.T) {
+	client := NewClient("test-token")
+
+	// This will fail with auth error, but that's expected
+	// We're just testing the method exists and handles errors
+	_, err := client.CreateAttachmentDownloadUrl("test-attachment-id")
+
+	// Should get an error (either auth or not found)
+	if err == nil {
+		t.Error("Expected error for invalid attachment ID")
+	}
+}

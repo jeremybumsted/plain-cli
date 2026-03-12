@@ -88,7 +88,16 @@ Core thread operations:
 
 - `plain threads list` - List threads with filters
 - `plain threads get <id>` - Get detailed thread information
+- `plain threads get <id> --timeline` - Get thread with full timeline history
 - `plain threads search <query>` - Search threads by text
+
+### Thread Attachments
+
+View and download attachments from threads:
+
+- `plain threads attachments list <thread-id>` - List all attachments in a thread
+- `plain threads attachments download <attachment-id>` - Download a specific attachment
+- `plain threads attachments download <attachment-id> --output <path>` - Download with custom filename
 
 ### Thread Actions
 
@@ -210,6 +219,18 @@ plain articles list --help-center-id hc_456def
 ```bash
 # List all todo threads
 plain threads list --status todo
+
+# Get thread with full timeline history
+plain threads get th_123abc --timeline
+
+# List all attachments in a thread
+plain threads attachments list th_123abc
+
+# Download a specific attachment
+plain threads attachments download att_789xyz
+
+# Download with custom output path
+plain threads attachments download att_789xyz --output /tmp/report.pdf
 
 # Assign a thread with confirmation
 plain threads assign th_123abc u_456def

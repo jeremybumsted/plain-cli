@@ -461,3 +461,67 @@ func lookupEnv(key string) (string, bool) {
 	}
 	return val, exists
 }
+
+// TestFormatFileSize tests the file size formatting function
+func TestFormatFileSize(t *testing.T) {
+	tests := []struct {
+		name  string
+		bytes int64
+		want  string
+	}{
+		{
+			name:  "bytes only",
+			bytes: 500,
+			want:  "500 B",
+		},
+		{
+			name:  "exactly 1 KB",
+			bytes: 1024,
+			want:  "1.0 KB",
+		},
+		{
+			name:  "kilobytes",
+			bytes: 15564, // ~15.2 KB
+			want:  "15.2 KB",
+		},
+		{
+			name:  "megabytes",
+			bytes: 250880, // ~245 KB
+			want:  "245.0 KB",
+		},
+		{
+			name:  "large megabytes",
+			bytes: 1887436, // ~1.8 MB
+			want:  "1.8 MB",
+		},
+		{
+			name:  "gigabytes",
+			bytes: 2147483648, // 2 GB
+			want:  "2.0 GB",
+		},
+		{
+			name:  "zero bytes",
+			bytes: 0,
+			want:  "0 B",
+		},
+		{
+			name:  "1 byte",
+			bytes: 1,
+			want:  "1 B",
+		},
+		{
+			name:  "1023 bytes (just under 1 KB)",
+			bytes: 1023,
+			want:  "1023 B",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatFileSize(tt.bytes)
+			if got != tt.want {
+				t.Errorf("formatFileSize(%d) = %v, want %v", tt.bytes, got, tt.want)
+			}
+		})
+	}
+}
