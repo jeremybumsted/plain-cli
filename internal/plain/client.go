@@ -200,6 +200,34 @@ type ThreadFieldSchema struct {
 	IsAiAutoFillEnabled bool     `json:"isAiAutoFillEnabled"`
 }
 
+// Workspace represents a Plain workspace
+type Workspace struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// HelpCenter represents a help center
+type HelpCenter struct {
+	ID string `json:"id"`
+}
+
+// HelpCenterArticle represents a help center article
+type HelpCenterArticle struct {
+	ID          string       `json:"id"`
+	Title       string       `json:"title"`
+	ContentHTML string       `json:"contentHtml"`
+	Slug        string       `json:"slug"`
+	Status      string       `json:"status"`
+	UpdatedAt   DateTime     `json:"updatedAt"`
+	Group       *ArticleGroup `json:"articleGroup"`
+}
+
+// ArticleGroup represents an article group
+type ArticleGroup struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // Timeline represents a thread timeline
 type Timeline struct {
 	Entries []TimelineEntry `json:"entries"`
@@ -1179,4 +1207,225 @@ func (c *Client) GetToken() string {
 // SetTimeout sets the HTTP client timeout
 func (c *Client) SetTimeout(timeout time.Duration) {
 	c.httpClient.Timeout = timeout
+}
+
+// Help Center Operations
+
+// ListHelpCenters fetches all available help centers
+func (c *Client) ListHelpCenters() ([]*HelpCenter, error) {
+	query := `
+		query ListHelpCenters {
+			helpCenters(first: 50) {
+				edges {
+					node {
+						id
+					}
+				}
+			}
+		}
+	`
+
+	var result struct {
+		Data struct {
+			HelpCenters struct {
+				Edges []struct {
+					Node HelpCenter `json:"node"`
+				} `json:"edges"`
+			} `json:"helpCenters"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	if err := c.graphql(query, nil, &result); err != nil {
+		return nil, err
+	}
+
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+	}
+
+	helpCenters := make([]*HelpCenter, 0, len(result.Data.HelpCenters.Edges))
+	for _, edge := range result.Data.HelpCenters.Edges {
+		hc := edge.Node
+		helpCenters = append(helpCenters, &hc)
+	}
+
+	return helpCenters, nil
+}
+
+// ListWorkspaces fetches the user's workspace
+func (c *Client) ListWorkspaces() ([]*Workspace, error) {
+	query := `
+		query GetMyWorkspace {
+			myWorkspace {
+				id
+				name
+			}
+		}
+	`
+
+	var result struct {
+		Data struct {
+			MyWorkspace *Workspace `json:"myWorkspace"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	if err := c.graphql(query, nil, &result); err != nil {
+		return nil, err
+	}
+
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+	}
+
+	// Check if myWorkspace is nil
+	if result.Data.MyWorkspace == nil {
+		return nil, fmt.Errorf("unable to fetch workspace: myWorkspace is nil")
+	}
+
+	// Return a slice with a single workspace
+	return []*Workspace{result.Data.MyWorkspace}, nil
+}
+
+// GetHelpCenterArticle fetches a single article by ID
+func (c *Client) GetHelpCenterArticle(articleID string) (*HelpCenterArticle, error) {
+	query := `
+		query HelpCenterArticle($id: ID!) {
+			helpCenterArticle(id: $id) {
+				id
+				title
+				contentHtml
+				slug
+				status
+				updatedAt { iso8601 }
+				articleGroup { id name }
+			}
+		}
+	`
+
+	variables := map[string]interface{}{
+		"id": articleID,
+	}
+
+	var result struct {
+		Data struct {
+			Article *HelpCenterArticle `json:"helpCenterArticle"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	if err := c.graphql(query, variables, &result); err != nil {
+		return nil, err
+	}
+
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+	}
+
+	if result.Data.Article == nil {
+		return nil, &Error{
+			StatusCode: 404,
+			Message:    fmt.Sprintf("Article not found: %s", articleID),
+		}
+	}
+
+	return result.Data.Article, nil
+}
+
+// ListHelpCenterArticles fetches all articles for a help center
+func (c *Client) ListHelpCenterArticles(helpCenterID string, includeContent bool) ([]*HelpCenterArticle, error) {
+	contentField := ""
+	if includeContent {
+		contentField = "contentHtml"
+	}
+
+	query := fmt.Sprintf(`
+		query HelpCenterArticles($id: ID!, $first: Int, $after: String) {
+			helpCenter(id: $id) {
+				articles(first: $first, after: $after) {
+					edges {
+						node {
+							id
+							title
+							slug
+							status
+							%s
+							updatedAt { iso8601 }
+							articleGroup { id name }
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+			}
+		}
+	`, contentField)
+
+	var allArticles []*HelpCenterArticle
+	cursor := ""
+
+	for {
+		variables := map[string]interface{}{
+			"id":    helpCenterID,
+			"first": 100,
+		}
+		if cursor != "" {
+			variables["after"] = cursor
+		}
+
+		var result struct {
+			Data struct {
+				HelpCenter *struct {
+					Articles struct {
+						Edges []struct {
+							Node HelpCenterArticle `json:"node"`
+						} `json:"edges"`
+						PageInfo struct {
+							HasNextPage bool   `json:"hasNextPage"`
+							EndCursor   string `json:"endCursor"`
+						} `json:"pageInfo"`
+					} `json:"articles"`
+				} `json:"helpCenter"`
+			} `json:"data"`
+			Errors []struct {
+				Message string `json:"message"`
+			} `json:"errors"`
+		}
+
+		if err := c.graphql(query, variables, &result); err != nil {
+			return nil, err
+		}
+
+		if len(result.Errors) > 0 {
+			return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+		}
+
+		if result.Data.HelpCenter == nil {
+			return nil, &Error{
+				StatusCode: 404,
+				Message:    fmt.Sprintf("Help center not found: %s", helpCenterID),
+			}
+		}
+
+		for _, edge := range result.Data.HelpCenter.Articles.Edges {
+			article := edge.Node
+			allArticles = append(allArticles, &article)
+		}
+
+		if !result.Data.HelpCenter.Articles.PageInfo.HasNextPage {
+			break
+		}
+		cursor = result.Data.HelpCenter.Articles.PageInfo.EndCursor
+	}
+
+	return allArticles, nil
 }

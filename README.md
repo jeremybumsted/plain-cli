@@ -24,33 +24,63 @@ go build -o plain
 
 ## Quick Start
 
-1. Authenticate with Plain:
+1. Configure Plain CLI (first-time setup):
 
 ```bash
-plain auth login
+plain config
 ```
 
-1. List your threads:
+This will walk you through:
+- API token authentication
+- Workspace selection
+- Help center selection (for articles)
+
+2. List your threads:
 
 ```bash
 plain threads list
 ```
 
-1. Get details on a specific thread:
+3. Get details on a specific thread:
 
 ```bash
 plain threads get th_123abc
 ```
 
+4. Browse help center articles:
+
+```bash
+plain articles list
+```
+
 ## Features
+
+### Configuration
+
+Set up and manage your Plain CLI configuration:
+
+- `plain config` - Interactive setup wizard (configures API token, workspace, and help center)
+- `plain config show` - Display current configuration
+- `plain config reset` - Clear all configuration
 
 ### Authentication
 
 Manage your Plain API authentication:
 
-- `plain auth login` - Authenticate with Plain API token
+- `plain auth login` - Authenticate with Plain API token (alternative to `plain config`)
 - `plain auth status` - Check current authentication status
 - `plain auth logout` - Log out and clear credentials
+
+### Help Center Articles
+
+Access and browse help center documentation (optimized for AI agents):
+
+- `plain articles list` - List all articles in your help center
+- `plain articles list --preview` - List articles with content previews (helps identify relevant articles)
+- `plain articles get <id>` - Get full article content as clean markdown
+- Output formats: markdown (default), JSON, quiet
+
+**AI Agent Integration**: Articles are output in clean markdown format, making them perfect for tools like Claude Code, Cursor, or other AI coding assistants. Agents can search articles with `list --preview` and fetch full content with `get`.
 
 ### Thread Management
 
@@ -104,9 +134,31 @@ plain threads get th_123abc -q
 
 ## Configuration
 
-Configure Plain CLI with:
+Configure Plain CLI settings:
 
-- `--config` flag - Specify custom config file path
+### Initial Setup
+
+Run `plain config` for an interactive setup wizard that configures:
+- API token (from https://app.plain.com/developer/api-keys)
+- Workspace selection
+- Help center selection
+
+### Config File
+
+Configuration is stored in `~/.config/plain-cli/config.json`
+
+### Environment Variables
+
+Override configuration with environment variables:
+- `PLAIN_API_TOKEN` - API token
+- `PLAIN_WORKSPACE_ID` - Workspace ID
+- `PLAIN_HELP_CENTER_ID` - Help center ID
+- `PLAIN_CONFIG` - Custom config file location
+
+### Config File Path
+
+Specify custom config file:
+- `--config` flag - Specify config file path for any command
 - `PLAIN_CONFIG` environment variable - Set default config location
 
 ## Thread ID Formats
@@ -118,39 +170,60 @@ Thread IDs can be provided in multiple formats:
 
 ## Examples
 
-### List all todo threads
+### Configuration
 
 ```bash
+# First-time setup
+plain config
+
+# View current configuration
+plain config show
+
+# Reconfigure specific settings
+plain config
+
+# Reset all configuration
+plain config reset
+```
+
+### Help Center Articles
+
+```bash
+# List all articles
+plain articles list
+
+# List with content previews (helpful for finding relevant articles)
+plain articles list --preview
+
+# Get specific article as markdown
+plain articles get hca_123abc
+
+# Get article as JSON
+plain articles get hca_123abc --format json
+
+# Override help center
+plain articles list --help-center-id hc_456def
+```
+
+### Thread Management
+
+```bash
+# List all todo threads
 plain threads list --status todo
-```
 
-### Assign a thread with confirmation
-
-```bash
+# Assign a thread with confirmation
 plain threads assign th_123abc u_456def
-```
 
-### Assign a thread without confirmation
-
-```bash
+# Assign a thread without confirmation
 plain threads assign th_123abc u_456def --yes
-```
 
-### Add multiple labels to a thread
-
-```bash
+# Add multiple labels to a thread
 plain threads label add th_123abc bug priority-high
-```
 
-### Search threads
-
-```bash
+# Search threads
 plain threads search "login issue"
-```
 
-### Get thread details as JSON
-
-```bash
+# Get thread details as JSON
 plain threads get th_123abc --json
 ```
 
