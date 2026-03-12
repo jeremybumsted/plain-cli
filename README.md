@@ -1,5 +1,6 @@
 # Plain CLI
 
+[![Build status](https://badge.buildkite.com/ef47e410871a642b0a8e25146b3030820aa61b670234180c29.svg)](https://buildkite.com/jeremy-bk/plain-cli)
 A command-line interface for working with [Plain](https://plain.com)
 
 ## Overview
@@ -31,23 +32,24 @@ plain config
 ```
 
 This will walk you through:
+
 - API token authentication
 - Workspace selection
 - Help center selection (for articles)
 
-2. List your threads:
+1. List your threads:
 
 ```bash
 plain threads list
 ```
 
-3. Get details on a specific thread:
+1. Get details on a specific thread:
 
 ```bash
 plain threads get th_123abc
 ```
 
-4. Browse help center articles:
+1. Browse help center articles:
 
 ```bash
 plain articles list
@@ -148,7 +150,8 @@ Configure Plain CLI settings:
 ### Initial Setup
 
 Run `plain config` for an interactive setup wizard that configures:
-- API token (from https://app.plain.com/developer/api-keys)
+
+- API token (from <https://app.plain.com/developer/api-keys>)
 - Workspace selection
 - Help center selection
 
@@ -159,6 +162,7 @@ Configuration is stored in `~/.config/plain-cli/config.json`
 ### Environment Variables
 
 Override configuration with environment variables:
+
 - `PLAIN_API_TOKEN` - API token
 - `PLAIN_WORKSPACE_ID` - Workspace ID
 - `PLAIN_HELP_CENTER_ID` - Help center ID
@@ -167,6 +171,7 @@ Override configuration with environment variables:
 ### Config File Path
 
 Specify custom config file:
+
 - `--config` flag - Specify config file path for any command
 - `PLAIN_CONFIG` environment variable - Set default config location
 
@@ -255,6 +260,22 @@ Check your installed version:
 ```bash
 plain version
 ```
+
+## Releases
+
+New releases are automatically created when a git tag is pushed. The release process:
+
+1. Tag a new version: `git tag v1.0.0`
+2. Push the tag: `git push origin v1.0.0`
+3. Buildkite automatically builds binaries for all platforms and creates a GitHub release
+
+Download the latest release from [GitHub Releases](https://github.com/jeremybumsted/plain-cli/releases).
+
+Binary archives are provided for:
+
+- **Linux**: amd64, arm64
+- **macOS**: amd64 (Intel), arm64 (Apple Silicon)
+- **Windows**: amd64, arm64
 
 ## License
 

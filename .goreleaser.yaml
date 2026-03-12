@@ -62,6 +62,27 @@ changelog:
       - Merge pull request
       - Merge branch
 
+release:
+  github:
+    owner: jeremybumsted
+    name: plain-cli
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} {{.Version}}"
+  footer: |
+    ## Installation
+
+    Download the appropriate binary for your platform from the assets below.
+
+    ### Quick Install (macOS/Linux)
+    ```bash
+    # Download and extract (replace OS and ARCH as needed)
+    curl -L https://github.com/jeremybumsted/plain-cli/releases/download/{{.Tag}}/plain_{{.Version}}_Darwin_arm64.tar.gz | tar xz
+
+    # Move to PATH
+    sudo mv plain /usr/local/bin/
+    ```
+
 # Optional: Homebrew tap configuration (uncomment if you want to publish to Homebrew)
 # brews:
 #   - repository:
