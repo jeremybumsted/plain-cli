@@ -15,6 +15,10 @@ const (
 	DefaultConfigFile = "config.json"
 	// EnvVarToken is the environment variable for overriding the API token
 	EnvVarToken = "PLAIN_API_TOKEN"
+	// EnvVarHelpCenterID is the environment variable for overriding the help center ID
+	EnvVarHelpCenterID = "PLAIN_HELP_CENTER_ID"
+	// EnvVarWorkspaceID is the environment variable for overriding the workspace ID
+	EnvVarWorkspaceID = "PLAIN_WORKSPACE_ID"
 )
 
 // Config holds the CLI configuration including OAuth credentials
@@ -27,6 +31,8 @@ type Config struct {
 
 	// User preferences
 	DefaultFormat string `json:"default_format,omitempty"` // "table", "json"
+	HelpCenterID  string `json:"help_center_id,omitempty"` // Default help center ID
+	WorkspaceID   string `json:"workspace_id,omitempty"`   // Default workspace ID
 
 	// Internal tracking
 	configPath string // Not serialized, used for saving
@@ -175,4 +181,69 @@ func (c *Config) GetConfigPath() string {
 		return path
 	}
 	return c.configPath
+}
+
+// SetConfigPath sets the config file path (useful for testing)
+func (c *Config) SetConfigPath(path string) {
+	c.configPath = path
+}
+
+// GetHelpCenterID returns the configured help center ID, checking env var first
+func (c *Config) GetHelpCenterID() (string, error) {
+	// Environment variable takes precedence
+	if id := os.Getenv(EnvVarHelpCenterID); id != "" {
+		return id, nil
+	}
+
+	// Use stored help center ID
+	if c.HelpCenterID == "" {
+		return "", errors.New("no help center configured: run 'plain config'")
+	}
+
+	return c.HelpCenterID, nil
+}
+
+// SetHelpCenterID stores the help center ID in the config
+func (c *Config) SetHelpCenterID(id string) error {
+	c.HelpCenterID = id
+	return c.Save()
+}
+
+// GetWorkspaceID returns the configured workspace ID, checking env var first
+func (c *Config) GetWorkspaceID() (string, error) {
+	// Environment variable takes precedence
+	if id := os.Getenv(EnvVarWorkspaceID); id != "" {
+		return id, nil
+	}
+
+	// Use stored workspace ID
+	if c.WorkspaceID == "" {
+		return "", errors.New("no workspace configured: run 'plain config'")
+	}
+
+	return c.WorkspaceID, nil
+}
+
+// SetWorkspaceID stores the workspace ID in the config
+func (c *Config) SetWorkspaceID(id string) error {
+	c.WorkspaceID = id
+	return c.Save()
+}
+
+// IsFullyConfigured returns true if all required configuration is present
+func (c *Config) IsFullyConfigured() bool {
+	// Check if authenticated (token present and not expired)
+	if !c.IsAuthenticated() {
+		return false
+	}
+
+	// Check if workspace ID is configured
+	_, err := c.GetWorkspaceID()
+	if err != nil {
+		return false
+	}
+
+	// Check if help center ID is configured
+	_, err = c.GetHelpCenterID()
+	return err == nil
 }

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="194" failures="0" errors="0" time="0.478340">
+	<testsuite tests="0" failures="0" time="0.270000" name="github.com/jeremybumsted/plain-cli" timestamp="2026-03-11T23:24:22-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.000000" name="github.com/jeremybumsted/plain-cli/cmd" timestamp="2026-03-11T23:24:22-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.269000" name="github.com/jeremybumsted/plain-cli/cmd/articles" timestamp="2026-03-11T23:24:22-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="17" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/cmd/config" timestamp="2026-03-11T23:24:22-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+		<testcase classname="cmd/config" name="TestConfigCmd_Run_NotAuthenticated" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestConfigCmd_Run_PartiallyConfigured" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestConfigCmd_Run_FullyConfigured" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestRunConfigMenuWithReader_ExitOption" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestRunConfigMenuWithReader_InvalidSelection" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestRunConfigMenuWithReader_NoInput" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestGetConfig" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestShowCurrentSettings/Fully_configured" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestShowCurrentSettings/Partially_configured" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestShowCurrentSettings/Not_configured" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestShowCurrentSettings/With_expiration" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestShowCurrentSettings/Short_token" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestShowCurrentSettings" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestConfigCmd_Run_WithExpiredToken" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestGetConfig_EmptyPath" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestRunConfigMenuWithReader_WhitespaceInSelection" time="0.000000"></testcase>
+		<testcase classname="cmd/config" name="TestConfigCmd_ConfigPath_Persistence" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="53" failures="0" time="0.002000" name="github.com/jeremybumsted/plain-cli/cmd/threads" timestamp="2026-03-11T23:24:23-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+		<testcase classname="cmd/threads" name="TestConfirmAction/skip_prompt_returns_true" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestConfirmAction/skip_prompt_with_different_message" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestConfirmAction" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/30_minutes" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/2_hours" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/1_day" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/3_days" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/2_weeks" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/ISO8601_format" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/invalid_format" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/invalid_unit" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/missing_number" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime/missing_unit" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTime" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/plain_thread_ID" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/URL_with_thread_ID" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/URL_with_query_params" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/URL_with_hash" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/mixed_case_thread_ID" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/no_thread_ID_pattern" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID/empty_string" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadID" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/just_now" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/1_minute_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/5_minutes_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/1_hour_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/3_hours_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/1_day_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/3_days_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/1_week_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/2_weeks_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/1_month_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/3_months_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/1_year_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime/2_years_ago" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestFormatTime" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString/no_truncation_needed" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString/exact_length" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString/truncate_long_string" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString/truncate_with_small_maxLen" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString/empty_string" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString/single_character_with_truncation" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestTruncateString" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTimeWithWhitespace/leading_whitespace" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTimeWithWhitespace/trailing_whitespace" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTimeWithWhitespace/both_leading_and_trailing" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestParseRelativeTimeWithWhitespace" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadIDEdgeCases/multiple_thread_IDs_-_returns_first" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadIDEdgeCases/thread_ID_in_middle_of_text" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadIDEdgeCases/URL_with_multiple_slashes" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestExtractThreadIDEdgeCases" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestOpenEditorNoEditorSet/editor_not_set_doesn&#39;t_panic" time="0.000000"></testcase>
+		<testcase classname="cmd/threads" name="TestOpenEditorNoEditorSet" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="60" failures="0" time="0.004000" name="github.com/jeremybumsted/plain-cli/internal/cache" timestamp="2026-03-11T23:24:23-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+		<testcase classname="internal/cache" name="TestLoadCache_Success" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLoadCache_FileNotExists" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLoadCache_CorruptedFile" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestSaveCache_Success" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestSaveCache_CreatesDirectory" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestIsFresh_Fresh" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestIsFresh_Stale" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestIsFresh_JustExpired" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestIsFresh_ZeroTTL" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestIsFresh_NegativeTTL" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestGetCacheDir" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestGetCachePath" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestSaveAndLoadRoundTrip" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestSaveFieldCache" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLoadFieldCache" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLoadFieldCache_NotExists" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_IsFresh" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByID" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey/priority" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey/Priority" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey/PRIORITY" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey/customerType" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey/customertype" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey/CUSTOMERTYPE" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_GetFieldSchemaByKey" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/threadFieldSchema_1" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/threadFieldSchema_2" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/threadFieldSchema_999" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/priority" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/Priority" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/PRIORITY" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/customerType" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/customertype" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier/nonExistent" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_ResolveFieldIdentifier" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestFieldCache_RoundTrip" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestSaveLabelCache" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLoadLabelCache" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLoadLabelCache_NotExists" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_IsFresh" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByID" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByName/Bug" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByName/bug" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByName/BUG" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByName/Feature_Request" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByName/feature_request" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelTypeByName" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/labelType_1" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/labelType_2" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/labelType_999" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/Bug" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/bug" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/BUG" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/Feature_Request" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/feature_request" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier/NonExistent" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifier" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_ResolveLabelIdentifiers" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_GetLabelNames" time="0.000000"></testcase>
+		<testcase classname="internal/cache" name="TestLabelCache_RoundTrip" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="32" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/internal/config" timestamp="2026-03-11T23:24:23-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+		<testcase classname="internal/config" name="TestLoadNonExistentConfig" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestSaveAndLoad" time="0.010000"></testcase>
+		<testcase classname="internal/config" name="TestIsAuthenticated/No_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsAuthenticated/Valid_token,_no_expiration" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsAuthenticated/Valid_token,_future_expiration" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsAuthenticated/Expired_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsAuthenticated" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetToken/Environment_variable_override" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetToken/Config_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetToken/No_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetToken/Expired_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetToken" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestClear" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetHelpCenterID/Environment_variable_override" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetHelpCenterID/Config_help_center_ID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetHelpCenterID/No_help_center_ID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetHelpCenterID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestSetHelpCenterID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetWorkspaceID/Environment_variable_override" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetWorkspaceID/Config_workspace_ID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetWorkspaceID/No_workspace_ID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestGetWorkspaceID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestSetWorkspaceID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/No_configuration" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/Only_access_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/Access_token_and_workspace_ID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/Access_token_and_help_center_ID" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/All_required_fields_configured" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/All_required_fields_configured_with_future_expiration" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/Expired_token" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured/Config_values_with_env_var_overrides" time="0.000000"></testcase>
+		<testcase classname="internal/config" name="TestIsFullyConfigured" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="14" failures="0" time="0.001000" name="github.com/jeremybumsted/plain-cli/internal/output" timestamp="2026-03-11T23:24:23-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+		<testcase classname="internal/output" name="TestNew" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestQuietMode" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestPrintJSON" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestPrintTable" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestPrintTableEmpty" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestPrintKeyValue" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestSuccess" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestSuccessQuiet" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestError" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestInfo" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestInfoQuiet" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestWarning" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestPrint" time="0.000000"></testcase>
+		<testcase classname="internal/output" name="TestPrintf" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="18" failures="0" time="0.000000" name="github.com/jeremybumsted/plain-cli/internal/plain" timestamp="2026-03-11T23:24:23-06:00">
+		<properties>
+			<property name="go.version" value="go1.25.5 darwin/arm64"></property>
+		</properties>
+		<testcase classname="internal/plain" name="TestNewClient" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestNewClientWithURL" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestGetToken" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestSetTimeout" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestRequest_Success" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestRequest_Error" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestRequest_WithBody" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestStubMethods/ReplyToThread" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestStubMethods" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListHelpCenters" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestGetHelpCenterArticle" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestGetHelpCenterArticle_NotFound" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListHelpCenterArticles" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListHelpCenterArticles_NotFound" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListWorkspaces" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListWorkspaces_Error/GraphQL_error" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListWorkspaces_Error/Nil_myWorkspace" time="0.000000"></testcase>
+		<testcase classname="internal/plain" name="TestListWorkspaces_Error" time="0.000000"></testcase>
+	</testsuite>
+</testsuites>
