@@ -9,15 +9,19 @@ import (
 
 // ListCmd represents the list threads command
 type ListCmd struct {
-	Status     string `help:"Filter by status" default:""`
-	Assignee   string `help:"Filter by assignee ID" default:""`
-	Priority   string `help:"Filter by priority" default:""`
-	Label      string `help:"Filter by label IDs (comma-separated)" default:""`
-	Mine       bool   `help:"Show only threads assigned to me"`
-	Limit      int    `help:"Number of results" default:"50"`
-	Offset     int    `help:"Pagination offset" default:"0"`
-	ConfigPath string `help:"Path to config file" default:""`
-	Format     string `help:"Output format (table, json, quiet)" default:"table"`
+	Status        string `help:"Filter by status" default:""`
+	Assignee      string `help:"Filter by assignee ID" default:""`
+	Priority      string `help:"Filter by priority" default:""`
+	Label         string `help:"Filter by label IDs (comma-separated)" default:""`
+	CreatedAfter  string `help:"Filter threads created after this date (ISO8601, relative like '7d', or 'yesterday')" default:""`
+	CreatedBefore string `help:"Filter threads created before this date (ISO8601 or relative)" default:""`
+	UpdatedAfter  string `help:"Filter threads updated after this date (ISO8601 or relative)" default:""`
+	UpdatedBefore string `help:"Filter threads updated before this date (ISO8601 or relative)" default:""`
+	Mine          bool   `help:"Show only threads assigned to me"`
+	Limit         int    `help:"Number of results" default:"50"`
+	Offset        int    `help:"Pagination offset" default:"0"`
+	ConfigPath    string `help:"Path to config file" default:""`
+	Format        string `help:"Output format (table, json, quiet)" default:"table"`
 }
 
 // Run executes the list threads command
