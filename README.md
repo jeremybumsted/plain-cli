@@ -93,6 +93,41 @@ Core thread operations:
 - `plain threads get <id> --timeline` - Get thread with full timeline history
 - `plain threads search <query>` - Search threads by text
 
+#### Date-Based Filtering
+
+Both `plain threads list` and `plain threads search` support flexible date filtering options to help you find threads based on when they were created or last updated.
+
+**Available Date Filter Flags:**
+
+- `--created-after` - Show only threads created after this date
+- `--created-before` - Show only threads created before this date
+- `--updated-after` - Show only threads updated after this date
+- `--updated-before` - Show only threads updated before this date
+
+**Supported Date Formats:**
+
+1. **ISO8601/RFC3339** - Full timestamp with timezone (automatically converted to UTC)
+   - Example: `2026-03-15T00:00:00Z`
+
+2. **Date Only** - Simple date format (assumes start of day in UTC)
+   - Format: `YYYY-MM-DD`
+   - Example: `2026-03-15`
+
+3. **Relative Dates** - Time ago from now
+   - `Nd` - N days ago (e.g., `7d` = 7 days ago)
+   - `Nw` - N weeks ago (e.g., `2w` = 2 weeks ago)
+   - `NM` - N months ago (e.g., `1M` = 1 month ago)
+   - `Ny` - N years ago (e.g., `1y` = 1 year ago)
+
+4. **Human-Readable** - Common time references
+   - `today` - Start of today
+   - `yesterday` - Start of yesterday
+   - `last-week` - 7 days ago
+   - `last-month` - 1 month ago
+   - `last-year` - 1 year ago
+
+All dates are normalized to UTC at the start of the day (00:00:00) for consistency.
+
 ### Thread Attachments
 
 View and download attachments from threads:
@@ -251,6 +286,46 @@ plain threads search "login issue"
 
 # Get thread details as JSON
 plain threads get th_123abc --json
+```
+
+### Date Filtering Examples
+
+```bash
+# Find threads from the last 7 days
+plain threads list --created-after 7d
+
+# Find threads from the last week
+plain threads list --created-after last-week
+
+# Find threads updated yesterday or later
+plain threads list --updated-after yesterday
+
+# Find threads in a specific date range
+plain threads list --created-after 2026-03-01 --created-before 2026-03-15
+
+# Find threads created in the last month that are still todo
+plain threads list --created-after 1M --status todo
+
+# Search for "bug" in threads from the last 2 weeks
+plain threads search "bug" --created-after 2w
+
+# Find high-priority threads updated in the last 3 days
+plain threads list --priority urgent --updated-after 3d
+
+# Combine date filters with other filters
+plain threads list --created-after last-month --status todo --assignee u_123abc
+
+# Find threads that haven't been updated in over a month
+plain threads list --updated-before 1M
+
+# Search for threads in a specific date range with priority filter
+plain threads search "payment" --created-after 2026-01-01 --created-before 2026-02-01 --priority high
+
+# Find your assigned threads from the last week
+plain threads list --mine --created-after last-week
+
+# Use ISO8601 format for precise timestamps
+plain threads list --created-after 2026-03-15T00:00:00Z --created-before 2026-03-15T23:59:59Z
 ```
 
 ## Version
