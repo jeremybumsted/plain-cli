@@ -430,6 +430,22 @@ type ThreadFilters struct {
 	Priority   string   `json:"priority,omitempty"`
 	Limit      int      `json:"limit,omitempty"`
 	Offset     int      `json:"offset,omitempty"`
+
+	// CreatedAfter filters threads created after this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	CreatedAfter string `json:"-"`
+
+	// CreatedBefore filters threads created before this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	CreatedBefore string `json:"-"`
+
+	// UpdatedAfter filters threads updated after this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	UpdatedAfter string `json:"-"`
+
+	// UpdatedBefore filters threads updated before this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	UpdatedBefore string `json:"-"`
 }
 
 // ThreadsResponse represents a paginated list of threads
