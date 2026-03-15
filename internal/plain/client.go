@@ -1139,6 +1139,30 @@ func (c *Client) SearchThreads(query string, filters *ThreadFilters) (*ThreadsRe
 		if len(filters.LabelIDs) > 0 {
 			filterMap["labelTypeIds"] = filters.LabelIDs
 		}
+
+		// Add date filters for createdAt
+		if filters.CreatedAfter != "" || filters.CreatedBefore != "" {
+			createdAtFilter := map[string]interface{}{}
+			if filters.CreatedAfter != "" {
+				createdAtFilter["after"] = filters.CreatedAfter
+			}
+			if filters.CreatedBefore != "" {
+				createdAtFilter["before"] = filters.CreatedBefore
+			}
+			filterMap["createdAt"] = createdAtFilter
+		}
+
+		// Add date filters for updatedAt
+		if filters.UpdatedAfter != "" || filters.UpdatedBefore != "" {
+			updatedAtFilter := map[string]interface{}{}
+			if filters.UpdatedAfter != "" {
+				updatedAtFilter["after"] = filters.UpdatedAfter
+			}
+			if filters.UpdatedBefore != "" {
+				updatedAtFilter["before"] = filters.UpdatedBefore
+			}
+			filterMap["updatedAt"] = updatedAtFilter
+		}
 	}
 
 	// Build variables
