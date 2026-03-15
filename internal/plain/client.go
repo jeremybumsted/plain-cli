@@ -545,6 +545,30 @@ func (c *Client) ListThreads(filters *ThreadFilters) (*ThreadsResponse, error) {
 		if len(filters.LabelIDs) > 0 {
 			threadFilters["labelTypeIds"] = filters.LabelIDs
 		}
+
+		// Add date filters for createdAt
+		if filters.CreatedAfter != "" || filters.CreatedBefore != "" {
+			createdAtFilter := map[string]interface{}{}
+			if filters.CreatedAfter != "" {
+				createdAtFilter["after"] = filters.CreatedAfter
+			}
+			if filters.CreatedBefore != "" {
+				createdAtFilter["before"] = filters.CreatedBefore
+			}
+			threadFilters["createdAt"] = createdAtFilter
+		}
+
+		// Add date filters for updatedAt
+		if filters.UpdatedAfter != "" || filters.UpdatedBefore != "" {
+			updatedAtFilter := map[string]interface{}{}
+			if filters.UpdatedAfter != "" {
+				updatedAtFilter["after"] = filters.UpdatedAfter
+			}
+			if filters.UpdatedBefore != "" {
+				updatedAtFilter["before"] = filters.UpdatedBefore
+			}
+			threadFilters["updatedAt"] = updatedAtFilter
+		}
 	}
 
 	if len(threadFilters) > 0 {
