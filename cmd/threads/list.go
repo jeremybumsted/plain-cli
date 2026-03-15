@@ -13,6 +13,7 @@ type ListCmd struct {
 	Assignee   string `help:"Filter by assignee ID" default:""`
 	Priority   string `help:"Filter by priority" default:""`
 	Label      string `help:"Filter by label IDs (comma-separated)" default:""`
+	Mine       bool   `help:"Show only threads assigned to me"`
 	Limit      int    `help:"Number of results" default:"50"`
 	Offset     int    `help:"Pagination offset" default:"0"`
 	ConfigPath string `help:"Path to config file" default:""`
@@ -33,13 +34,28 @@ func (cmd *ListCmd) Run() error {
 		return fmt.Errorf("not authenticated: run 'plain auth login'")
 	}
 
-	// 3. Parse filters from flags
+	// 3. Validate flags - ensure --mine and --assignee are mutually exclusive
+	if cmd.Mine && cmd.Assignee != "" {
+		return fmt.Errorf("cannot use both --mine and --assignee flags")
+	}
+
+	// 4. Parse filters from flags
 	filters := &plain.ThreadFilters{
-		Status:     cmd.Status,
-		AssigneeID: cmd.Assignee,
-		Priority:   cmd.Priority,
-		Limit:      cmd.Limit,
-		Offset:     cmd.Offset,
+		Status:   cmd.Status,
+		Priority: cmd.Priority,
+		Limit:    cmd.Limit,
+		Offset:   cmd.Offset,
+	}
+
+	// Handle --mine flag
+	if cmd.Mine {
+		userID, err := cfg.GetUserID()
+		if err != nil {
+			return fmt.Errorf("cannot use --mine: %w", err)
+		}
+		filters.AssigneeID = userID
+	} else if cmd.Assignee != "" {
+		filters.AssigneeID = cmd.Assignee
 	}
 
 	// Parse label IDs (comma-separated)
@@ -51,13 +67,13 @@ func (cmd *ListCmd) Run() error {
 		filters.LabelIDs = labelIDs
 	}
 
-	// 4. Call client.ListThreads()
+	// 5. Call client.ListThreads()
 	response, err := client.ListThreads(filters)
 	if err != nil {
 		return fmt.Errorf("failed to list threads: %w", err)
 	}
 
-	// 5. Format and display results
+	// 6. Format and display results
 	formatter := getFormatter(cmd.Format)
 
 	// Handle different output formats

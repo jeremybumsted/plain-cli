@@ -507,3 +507,217 @@ func TestIsFullyConfigured(t *testing.T) {
 		})
 	}
 }
+
+func TestSetUserInfo(t *testing.T) {
+	// Create temp directory
+	tempDir := t.TempDir()
+	configPath := filepath.Join(tempDir, "config.json")
+
+	config := &Config{
+		configPath: configPath,
+	}
+
+	// Set user info
+	err := config.SetUserInfo("user_123", "test@example.com", "Test User", "Testy")
+	if err != nil {
+		t.Fatalf("Failed to set user info: %v", err)
+	}
+
+	// Verify fields are set
+	if config.UserID != "user_123" {
+		t.Errorf("Expected UserID 'user_123', got '%s'", config.UserID)
+	}
+	if config.UserEmail != "test@example.com" {
+		t.Errorf("Expected UserEmail 'test@example.com', got '%s'", config.UserEmail)
+	}
+	if config.UserFullName != "Test User" {
+		t.Errorf("Expected UserFullName 'Test User', got '%s'", config.UserFullName)
+	}
+	if config.UserPublicName != "Testy" {
+		t.Errorf("Expected UserPublicName 'Testy', got '%s'", config.UserPublicName)
+	}
+
+	// Verify it was saved
+	loadedConfig, err := Load(configPath)
+	if err != nil {
+		t.Fatalf("Failed to load config: %v", err)
+	}
+
+	if loadedConfig.UserID != "user_123" {
+		t.Errorf("Expected loaded UserID 'user_123', got '%s'", loadedConfig.UserID)
+	}
+	if loadedConfig.UserEmail != "test@example.com" {
+		t.Errorf("Expected loaded UserEmail 'test@example.com', got '%s'", loadedConfig.UserEmail)
+	}
+	if loadedConfig.UserFullName != "Test User" {
+		t.Errorf("Expected loaded UserFullName 'Test User', got '%s'", loadedConfig.UserFullName)
+	}
+	if loadedConfig.UserPublicName != "Testy" {
+		t.Errorf("Expected loaded UserPublicName 'Testy', got '%s'", loadedConfig.UserPublicName)
+	}
+}
+
+func TestGetUserID(t *testing.T) {
+	// Test with user ID set
+	t.Run("User ID configured", func(t *testing.T) {
+		config := &Config{
+			UserID: "user_123",
+		}
+
+		id, err := config.GetUserID()
+		if err != nil {
+			t.Fatalf("Unexpected error: %v", err)
+		}
+
+		if id != "user_123" {
+			t.Errorf("Expected user ID 'user_123', got '%s'", id)
+		}
+	})
+
+	// Test with no user ID
+	t.Run("No user ID configured", func(t *testing.T) {
+		config := &Config{}
+
+		_, err := config.GetUserID()
+		if err == nil {
+			t.Error("Expected error for missing user ID")
+		}
+
+		expectedErrMsg := "user not configured: run 'plain config user'"
+		if err.Error() != expectedErrMsg {
+			t.Errorf("Expected error message '%s', got '%s'", expectedErrMsg, err.Error())
+		}
+	})
+}
+
+func TestClearUserInfo(t *testing.T) {
+	config := &Config{
+		UserID:         "user_123",
+		UserEmail:      "test@example.com",
+		UserFullName:   "Test User",
+		UserPublicName: "Testy",
+	}
+
+	config.ClearUserInfo()
+
+	if config.UserID != "" {
+		t.Errorf("UserID should be empty after ClearUserInfo(), got '%s'", config.UserID)
+	}
+	if config.UserEmail != "" {
+		t.Errorf("UserEmail should be empty after ClearUserInfo(), got '%s'", config.UserEmail)
+	}
+	if config.UserFullName != "" {
+		t.Errorf("UserFullName should be empty after ClearUserInfo(), got '%s'", config.UserFullName)
+	}
+	if config.UserPublicName != "" {
+		t.Errorf("UserPublicName should be empty after ClearUserInfo(), got '%s'", config.UserPublicName)
+	}
+}
+
+func TestHasUserConfigured(t *testing.T) {
+	tests := []struct {
+		name     string
+		config   *Config
+		expected bool
+	}{
+		{
+			name:     "No user configured",
+			config:   &Config{},
+			expected: false,
+		},
+		{
+			name: "User ID configured",
+			config: &Config{
+				UserID: "user_123",
+			},
+			expected: true,
+		},
+		{
+			name: "All user fields configured",
+			config: &Config{
+				UserID:         "user_123",
+				UserEmail:      "test@example.com",
+				UserFullName:   "Test User",
+				UserPublicName: "Testy",
+			},
+			expected: true,
+		},
+		{
+			name: "Only email configured (no user ID)",
+			config: &Config{
+				UserEmail: "test@example.com",
+			},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.config.HasUserConfigured()
+			if result != tt.expected {
+				t.Errorf("Expected HasUserConfigured() = %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestUserInfoPersistence(t *testing.T) {
+	// Create temp directory
+	tempDir := t.TempDir()
+	configPath := filepath.Join(tempDir, "config.json")
+
+	// Create config and set user info
+	config := &Config{
+		configPath: configPath,
+	}
+
+	err := config.SetUserInfo("user_456", "persist@example.com", "Persist User", "Persister")
+	if err != nil {
+		t.Fatalf("Failed to set user info: %v", err)
+	}
+
+	// Load config from disk
+	loadedConfig, err := Load(configPath)
+	if err != nil {
+		t.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Verify all user fields persisted
+	if loadedConfig.UserID != "user_456" {
+		t.Errorf("Expected persisted UserID 'user_456', got '%s'", loadedConfig.UserID)
+	}
+	if loadedConfig.UserEmail != "persist@example.com" {
+		t.Errorf("Expected persisted UserEmail 'persist@example.com', got '%s'", loadedConfig.UserEmail)
+	}
+	if loadedConfig.UserFullName != "Persist User" {
+		t.Errorf("Expected persisted UserFullName 'Persist User', got '%s'", loadedConfig.UserFullName)
+	}
+	if loadedConfig.UserPublicName != "Persister" {
+		t.Errorf("Expected persisted UserPublicName 'Persister', got '%s'", loadedConfig.UserPublicName)
+	}
+
+	// Verify HasUserConfigured returns true
+	if !loadedConfig.HasUserConfigured() {
+		t.Error("Expected HasUserConfigured() to return true after loading persisted user info")
+	}
+
+	// Clear user info and save
+	loadedConfig.ClearUserInfo()
+	err = loadedConfig.Save()
+	if err != nil {
+		t.Fatalf("Failed to save config after clearing: %v", err)
+	}
+
+	// Load again and verify user info is cleared
+	clearedConfig, err := Load(configPath)
+	if err != nil {
+		t.Fatalf("Failed to load config after clear: %v", err)
+	}
+
+	if clearedConfig.UserID != "" {
+		t.Errorf("Expected cleared UserID to be empty, got '%s'", clearedConfig.UserID)
+	}
+	if clearedConfig.HasUserConfigured() {
+		t.Error("Expected HasUserConfigured() to return false after clearing user info")
+	}
+}

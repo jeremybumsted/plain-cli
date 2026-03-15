@@ -184,9 +184,10 @@ type LabelType struct {
 
 // User represents a Plain user
 type User struct {
-	ID       string `json:"id"`
-	Email    string `json:"email"`
-	FullName string `json:"fullName"`
+	ID         string `json:"id"`
+	Email      string `json:"email"`
+	FullName   string `json:"fullName"`
+	PublicName string `json:"publicName,omitempty"`
 }
 
 // Attachment represents a file attachment
@@ -1921,6 +1922,125 @@ func (c *Client) ListHelpCenterArticles(helpCenterID string, includeContent bool
 	}
 
 	return allArticles, nil
+}
+
+// User Operations
+
+// GetUserByEmail finds a user by their email address
+func (c *Client) GetUserByEmail(email string) (*User, error) {
+	query := `
+		query GetUserByEmail($email: String!) {
+			userByEmail(email: $email) {
+				id
+				email
+				fullName
+				publicName
+			}
+		}
+	`
+
+	variables := map[string]interface{}{
+		"email": email,
+	}
+
+	var result struct {
+		Data struct {
+			UserByEmail *User `json:"userByEmail"`
+		} `json:"data"`
+		Errors []struct {
+			Message string `json:"message"`
+		} `json:"errors"`
+	}
+
+	if err := c.graphql(query, variables, &result); err != nil {
+		return nil, err
+	}
+
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+	}
+
+	if result.Data.UserByEmail == nil {
+		return nil, fmt.Errorf("user not found with email: %s", email)
+	}
+
+	return result.Data.UserByEmail, nil
+}
+
+// ListUsers fetches all users in the workspace
+func (c *Client) ListUsers(assignableOnly bool) ([]*User, error) {
+	query := `
+		query ListUsers($filters: UsersFilter, $first: Int, $after: String) {
+			users(filters: $filters, first: $first, after: $after) {
+				edges {
+					node {
+						id
+						email
+						fullName
+						publicName
+					}
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+			}
+		}
+	`
+
+	var allUsers []*User
+	cursor := ""
+
+	for {
+		variables := map[string]interface{}{
+			"first": 100,
+		}
+		if assignableOnly {
+			variables["filters"] = map[string]interface{}{
+				"isAssignableToThread": true,
+			}
+		}
+		if cursor != "" {
+			variables["after"] = cursor
+		}
+
+		var result struct {
+			Data struct {
+				Users struct {
+					Edges []struct {
+						Node User `json:"node"`
+					} `json:"edges"`
+					PageInfo struct {
+						HasNextPage bool   `json:"hasNextPage"`
+						EndCursor   string `json:"endCursor"`
+					} `json:"pageInfo"`
+				} `json:"users"`
+			} `json:"data"`
+			Errors []struct {
+				Message string `json:"message"`
+			} `json:"errors"`
+		}
+
+		if err := c.graphql(query, variables, &result); err != nil {
+			return nil, err
+		}
+
+		if len(result.Errors) > 0 {
+			return nil, fmt.Errorf("GraphQL error: %s", result.Errors[0].Message)
+		}
+
+		for _, edge := range result.Data.Users.Edges {
+			user := edge.Node
+			allUsers = append(allUsers, &user)
+		}
+
+		if !result.Data.Users.PageInfo.HasNextPage {
+			break
+		}
+		cursor = result.Data.Users.PageInfo.EndCursor
+	}
+
+	return allUsers, nil
 }
 
 // CreateAttachmentDownloadUrl creates a temporary download URL for an attachment

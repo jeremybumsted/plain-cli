@@ -34,6 +34,12 @@ type Config struct {
 	HelpCenterID  string `json:"help_center_id,omitempty"` // Default help center ID
 	WorkspaceID   string `json:"workspace_id,omitempty"`   // Default workspace ID
 
+	// User information (configured by user for personalized queries)
+	UserID         string `json:"user_id,omitempty"`
+	UserEmail      string `json:"user_email,omitempty"`
+	UserFullName   string `json:"user_full_name,omitempty"`
+	UserPublicName string `json:"user_public_name,omitempty"`
+
 	// Internal tracking
 	configPath string // Not serialized, used for saving
 }
@@ -246,4 +252,34 @@ func (c *Config) IsFullyConfigured() bool {
 	// Check if help center ID is configured
 	_, err = c.GetHelpCenterID()
 	return err == nil
+}
+
+// GetUserID returns the configured user ID, checking for existence
+func (c *Config) GetUserID() (string, error) {
+	if c.UserID == "" {
+		return "", errors.New("user not configured: run 'plain config user'")
+	}
+	return c.UserID, nil
+}
+
+// SetUserInfo stores user information in the config
+func (c *Config) SetUserInfo(id, email, fullName, publicName string) error {
+	c.UserID = id
+	c.UserEmail = email
+	c.UserFullName = fullName
+	c.UserPublicName = publicName
+	return c.Save()
+}
+
+// ClearUserInfo removes user information from the config
+func (c *Config) ClearUserInfo() {
+	c.UserID = ""
+	c.UserEmail = ""
+	c.UserFullName = ""
+	c.UserPublicName = ""
+}
+
+// HasUserConfigured returns true if user info is configured
+func (c *Config) HasUserConfigured() bool {
+	return c.UserID != ""
 }
