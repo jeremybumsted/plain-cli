@@ -5,19 +5,24 @@ import (
 	"strings"
 
 	"github.com/jeremybumsted/plain-cli/internal/plain"
+	"github.com/jeremybumsted/plain-cli/internal/util"
 )
 
 // SearchCmd represents the threads search command
 type SearchCmd struct {
-	Query      string `arg:"" help:"Search query" required:""`
-	Status     string `help:"Filter by status" default:""`
-	Priority   string `help:"Filter by priority" default:""`
-	Assignee   string `help:"Filter by assignee ID" default:""`
-	Label      string `help:"Filter by label IDs (comma-separated)" default:""`
-	Limit      int    `help:"Number of results" default:"50"`
-	Offset     int    `help:"Pagination offset" default:"0"`
-	ConfigPath string `help:"Path to config file" default:""`
-	Format     string `help:"Output format (table, json, quiet)" default:"table"`
+	Query         string `arg:"" help:"Search query" required:""`
+	Status        string `help:"Filter by status" default:""`
+	Priority      string `help:"Filter by priority" default:""`
+	Assignee      string `help:"Filter by assignee ID" default:""`
+	Label         string `help:"Filter by label IDs (comma-separated)" default:""`
+	CreatedAfter  string `help:"Filter threads created after this date (ISO8601, relative like '7d', or 'yesterday')" default:""`
+	CreatedBefore string `help:"Filter threads created before this date (ISO8601 or relative)" default:""`
+	UpdatedAfter  string `help:"Filter threads updated after this date (ISO8601 or relative)" default:""`
+	UpdatedBefore string `help:"Filter threads updated before this date (ISO8601 or relative)" default:""`
+	Limit         int    `help:"Number of results" default:"50"`
+	Offset        int    `help:"Pagination offset" default:"0"`
+	ConfigPath    string `help:"Path to config file" default:""`
+	Format        string `help:"Output format (table, json, quiet)" default:"table"`
 }
 
 // Run executes the search command
@@ -56,6 +61,48 @@ func (cmd *SearchCmd) Run() error {
 			labelIDs[i] = strings.TrimSpace(labelIDs[i])
 		}
 		filters.LabelIDs = labelIDs
+	}
+
+	// Parse and validate date filters
+	if cmd.CreatedAfter != "" {
+		parsedDate, err := util.ParseDateToISO8601(cmd.CreatedAfter)
+		if err != nil {
+			return fmt.Errorf("invalid --created-after date: %w", err)
+		}
+		filters.CreatedAfter = parsedDate
+	}
+
+	if cmd.CreatedBefore != "" {
+		parsedDate, err := util.ParseDateToISO8601(cmd.CreatedBefore)
+		if err != nil {
+			return fmt.Errorf("invalid --created-before date: %w", err)
+		}
+		filters.CreatedBefore = parsedDate
+	}
+
+	if cmd.UpdatedAfter != "" {
+		parsedDate, err := util.ParseDateToISO8601(cmd.UpdatedAfter)
+		if err != nil {
+			return fmt.Errorf("invalid --updated-after date: %w", err)
+		}
+		filters.UpdatedAfter = parsedDate
+	}
+
+	if cmd.UpdatedBefore != "" {
+		parsedDate, err := util.ParseDateToISO8601(cmd.UpdatedBefore)
+		if err != nil {
+			return fmt.Errorf("invalid --updated-before date: %w", err)
+		}
+		filters.UpdatedBefore = parsedDate
+	}
+
+	// Validate date ranges
+	if err := util.ValidateDateRange(cmd.CreatedAfter, cmd.CreatedBefore); err != nil {
+		return fmt.Errorf("invalid created date range: %w", err)
+	}
+
+	if err := util.ValidateDateRange(cmd.UpdatedAfter, cmd.UpdatedBefore); err != nil {
+		return fmt.Errorf("invalid updated date range: %w", err)
 	}
 
 	// Search threads
