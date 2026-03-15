@@ -338,3 +338,68 @@ func TestConfigCmd_ConfigPath_Persistence(t *testing.T) {
 			configPath, loadedCfg.GetConfigPath())
 	}
 }
+
+func TestShowCurrentSettingsWithUser(t *testing.T) {
+	tests := []struct {
+		name           string
+		config         *config.Config
+		expectUserInfo bool
+	}{
+		{
+			name: "With user configured",
+			config: &config.Config{
+				AccessToken:  "test-token-1234567890",
+				WorkspaceID:  "ws_test123",
+				HelpCenterID: "hc_test456",
+				UserID:       "u_123456",
+				UserEmail:    "test@example.com",
+				UserFullName: "Test User",
+			},
+			expectUserInfo: true,
+		},
+		{
+			name: "Without user configured",
+			config: &config.Config{
+				AccessToken:  "test-token-1234567890",
+				WorkspaceID:  "ws_test123",
+				HelpCenterID: "hc_test456",
+			},
+			expectUserInfo: false,
+		},
+		{
+			name: "With partial user info (should show if UserID present)",
+			config: &config.Config{
+				AccessToken: "test-token-1234567890",
+				UserID:      "u_789012",
+				UserEmail:   "partial@example.com",
+			},
+			expectUserInfo: true,
+		},
+		{
+			name: "With empty config",
+			config: &config.Config{},
+			expectUserInfo: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// This test verifies that showCurrentSettings doesn't panic
+			// and properly handles user info display
+			defer func() {
+				if r := recover(); r != nil {
+					t.Errorf("showCurrentSettings panicked: %v", r)
+				}
+			}()
+
+			// Verify the HasUserConfigured method works as expected
+			hasUser := tt.config.HasUserConfigured()
+			if hasUser != tt.expectUserInfo {
+				t.Errorf("HasUserConfigured() = %v, want %v", hasUser, tt.expectUserInfo)
+			}
+
+			// Call the function to ensure it doesn't panic
+			showCurrentSettings(tt.config)
+		})
+	}
+}

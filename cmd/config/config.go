@@ -15,6 +15,7 @@ import (
 type ConfigCmd struct {
 	Show  ShowCmd  `cmd:"" help:"Show current configuration"`
 	Reset ResetCmd `cmd:"" help:"Reset configuration"`
+	User  UserCmd  `cmd:"" help:"Configure your user identity"`
 }
 
 // Run executes the interactive configuration
@@ -137,5 +138,13 @@ func showCurrentSettings(cfg *config.Config) {
 		fmt.Printf("  Help Center: %s\n", hcID)
 	} else {
 		fmt.Println("  Help Center: Not configured")
+	}
+
+	// User
+	if cfg.HasUserConfigured() {
+		fmt.Printf("  User: %s (%s)\n", cfg.UserFullName, cfg.UserEmail)
+		fmt.Printf("  User ID: %s\n", cfg.UserID)
+	} else {
+		fmt.Println("  User: Not configured (run 'plain config user')")
 	}
 }

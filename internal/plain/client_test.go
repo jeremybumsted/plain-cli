@@ -556,3 +556,209 @@ func TestCreateAttachmentDownloadUrl(t *testing.T) {
 		t.Error("Expected error for invalid attachment ID")
 	}
 }
+
+func TestGetUserByEmail(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		response := map[string]interface{}{
+			"data": map[string]interface{}{
+				"userByEmail": map[string]interface{}{
+					"id":         "u_123",
+					"email":      "test@example.com",
+					"fullName":   "Test User",
+					"publicName": "TUser",
+				},
+			},
+		}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			t.Errorf("Failed to encode response: %v", err)
+		}
+	}))
+	defer server.Close()
+
+	client := NewClientWithURL("test-token", server.URL)
+
+	user, err := client.GetUserByEmail("test@example.com")
+	if err != nil {
+		t.Fatalf("GetUserByEmail failed: %v", err)
+	}
+
+	if user.ID != "u_123" {
+		t.Errorf("Expected user ID 'u_123', got '%s'", user.ID)
+	}
+
+	if user.Email != "test@example.com" {
+		t.Errorf("Expected user email 'test@example.com', got '%s'", user.Email)
+	}
+
+	if user.FullName != "Test User" {
+		t.Errorf("Expected user fullName 'Test User', got '%s'", user.FullName)
+	}
+
+	if user.PublicName != "TUser" {
+		t.Errorf("Expected user publicName 'TUser', got '%s'", user.PublicName)
+	}
+}
+
+func TestGetUserByEmailNotFound(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		response := map[string]interface{}{
+			"data": map[string]interface{}{
+				"userByEmail": nil,
+			},
+		}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			t.Errorf("Failed to encode response: %v", err)
+		}
+	}))
+	defer server.Close()
+
+	client := NewClientWithURL("test-token", server.URL)
+
+	_, err := client.GetUserByEmail("nonexistent@example.com")
+	if err == nil {
+		t.Fatal("Expected error for non-existent user, got nil")
+	}
+
+	expectedErr := "user not found with email: nonexistent@example.com"
+	if err.Error() != expectedErr {
+		t.Errorf("Expected error message '%s', got '%s'", expectedErr, err.Error())
+	}
+}
+
+func TestListUsers(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		response := map[string]interface{}{
+			"data": map[string]interface{}{
+				"users": map[string]interface{}{
+					"edges": []map[string]interface{}{
+						{
+							"node": map[string]interface{}{
+								"id":         "u_123",
+								"email":      "user1@example.com",
+								"fullName":   "User One",
+								"publicName": "U1",
+							},
+						},
+						{
+							"node": map[string]interface{}{
+								"id":         "u_456",
+								"email":      "user2@example.com",
+								"fullName":   "User Two",
+								"publicName": "U2",
+							},
+						},
+					},
+					"pageInfo": map[string]interface{}{
+						"hasNextPage": false,
+						"endCursor":   "",
+					},
+				},
+			},
+		}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			t.Errorf("Failed to encode response: %v", err)
+		}
+	}))
+	defer server.Close()
+
+	client := NewClientWithURL("test-token", server.URL)
+
+	users, err := client.ListUsers(false)
+	if err != nil {
+		t.Fatalf("ListUsers failed: %v", err)
+	}
+
+	if len(users) != 2 {
+		t.Fatalf("Expected 2 users, got %d", len(users))
+	}
+
+	if users[0].ID != "u_123" {
+		t.Errorf("Expected first user ID 'u_123', got '%s'", users[0].ID)
+	}
+
+	if users[0].Email != "user1@example.com" {
+		t.Errorf("Expected first user email 'user1@example.com', got '%s'", users[0].Email)
+	}
+
+	if users[1].ID != "u_456" {
+		t.Errorf("Expected second user ID 'u_456', got '%s'", users[1].ID)
+	}
+}
+
+func TestListUsersAssignableOnly(t *testing.T) {
+	requestCount := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Verify that the filters parameter was sent
+		var reqBody map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+			t.Errorf("Failed to decode request body: %v", err)
+			http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+			return
+		}
+
+		variables, ok := reqBody["variables"].(map[string]interface{})
+		if !ok {
+			t.Error("Expected variables in request")
+		} else {
+			filters, hasFilters := variables["filters"].(map[string]interface{})
+			if !hasFilters {
+				t.Error("Expected filters in variables")
+			} else {
+				isAssignable, ok := filters["isAssignableToThread"].(bool)
+				if !ok || !isAssignable {
+					t.Error("Expected isAssignableToThread to be true")
+				}
+			}
+		}
+
+		requestCount++
+
+		response := map[string]interface{}{
+			"data": map[string]interface{}{
+				"users": map[string]interface{}{
+					"edges": []map[string]interface{}{
+						{
+							"node": map[string]interface{}{
+								"id":         "u_assignable",
+								"email":      "assignable@example.com",
+								"fullName":   "Assignable User",
+								"publicName": "AU",
+							},
+						},
+					},
+					"pageInfo": map[string]interface{}{
+						"hasNextPage": false,
+						"endCursor":   "",
+					},
+				},
+			},
+		}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			t.Errorf("Failed to encode response: %v", err)
+		}
+	}))
+	defer server.Close()
+
+	client := NewClientWithURL("test-token", server.URL)
+
+	users, err := client.ListUsers(true)
+	if err != nil {
+		t.Fatalf("ListUsers failed: %v", err)
+	}
+
+	if len(users) != 1 {
+		t.Fatalf("Expected 1 user, got %d", len(users))
+	}
+
+	if users[0].ID != "u_assignable" {
+		t.Errorf("Expected user ID 'u_assignable', got '%s'", users[0].ID)
+	}
+
+	if requestCount != 1 {
+		t.Errorf("Expected 1 request, got %d", requestCount)
+	}
+}
