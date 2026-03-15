@@ -430,6 +430,22 @@ type ThreadFilters struct {
 	Priority   string   `json:"priority,omitempty"`
 	Limit      int      `json:"limit,omitempty"`
 	Offset     int      `json:"offset,omitempty"`
+
+	// CreatedAfter filters threads created after this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	CreatedAfter string `json:"-"`
+
+	// CreatedBefore filters threads created before this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	CreatedBefore string `json:"-"`
+
+	// UpdatedAfter filters threads updated after this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	UpdatedAfter string `json:"-"`
+
+	// UpdatedBefore filters threads updated before this timestamp (ISO8601 format)
+	// Example: "2026-03-15T00:00:00Z"
+	UpdatedBefore string `json:"-"`
 }
 
 // ThreadsResponse represents a paginated list of threads
@@ -528,6 +544,30 @@ func (c *Client) ListThreads(filters *ThreadFilters) (*ThreadsResponse, error) {
 
 		if len(filters.LabelIDs) > 0 {
 			threadFilters["labelTypeIds"] = filters.LabelIDs
+		}
+
+		// Add date filters for createdAt
+		if filters.CreatedAfter != "" || filters.CreatedBefore != "" {
+			createdAtFilter := map[string]interface{}{}
+			if filters.CreatedAfter != "" {
+				createdAtFilter["after"] = filters.CreatedAfter
+			}
+			if filters.CreatedBefore != "" {
+				createdAtFilter["before"] = filters.CreatedBefore
+			}
+			threadFilters["createdAt"] = createdAtFilter
+		}
+
+		// Add date filters for updatedAt
+		if filters.UpdatedAfter != "" || filters.UpdatedBefore != "" {
+			updatedAtFilter := map[string]interface{}{}
+			if filters.UpdatedAfter != "" {
+				updatedAtFilter["after"] = filters.UpdatedAfter
+			}
+			if filters.UpdatedBefore != "" {
+				updatedAtFilter["before"] = filters.UpdatedBefore
+			}
+			threadFilters["updatedAt"] = updatedAtFilter
 		}
 	}
 
@@ -1098,6 +1138,30 @@ func (c *Client) SearchThreads(query string, filters *ThreadFilters) (*ThreadsRe
 		}
 		if len(filters.LabelIDs) > 0 {
 			filterMap["labelTypeIds"] = filters.LabelIDs
+		}
+
+		// Add date filters for createdAt
+		if filters.CreatedAfter != "" || filters.CreatedBefore != "" {
+			createdAtFilter := map[string]interface{}{}
+			if filters.CreatedAfter != "" {
+				createdAtFilter["after"] = filters.CreatedAfter
+			}
+			if filters.CreatedBefore != "" {
+				createdAtFilter["before"] = filters.CreatedBefore
+			}
+			filterMap["createdAt"] = createdAtFilter
+		}
+
+		// Add date filters for updatedAt
+		if filters.UpdatedAfter != "" || filters.UpdatedBefore != "" {
+			updatedAtFilter := map[string]interface{}{}
+			if filters.UpdatedAfter != "" {
+				updatedAtFilter["after"] = filters.UpdatedAfter
+			}
+			if filters.UpdatedBefore != "" {
+				updatedAtFilter["before"] = filters.UpdatedBefore
+			}
+			filterMap["updatedAt"] = updatedAtFilter
 		}
 	}
 

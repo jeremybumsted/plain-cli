@@ -267,3 +267,228 @@ func TestConfigPersistence(t *testing.T) {
 		t.Errorf("Loaded UserEmail = %v, want %v", cfg2.UserEmail, "persist@example.com")
 	}
 }
+
+// TestListCmdDateParsingValidDates tests that valid date formats are parsed correctly
+func TestListCmdDateParsingValidDates(t *testing.T) {
+	// Create a temporary config file
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+
+	cfg := &config.Config{}
+	cfg.SetConfigPath(configPath)
+	cfg.SetTokens("fake_token", "fake_refresh", "Bearer", 3600)
+	err := cfg.Save()
+	if err != nil {
+		t.Fatalf("Failed to save config: %v", err)
+	}
+
+	tests := []struct {
+		name          string
+		createdAfter  string
+		createdBefore string
+		updatedAfter  string
+		updatedBefore string
+		shouldFail    bool
+	}{
+		{
+			name:         "ISO8601 dates",
+			createdAfter: "2026-03-01T00:00:00Z",
+			shouldFail:   false,
+		},
+		{
+			name:         "Date only format",
+			createdAfter: "2026-03-01",
+			shouldFail:   false,
+		},
+		{
+			name:         "Relative date - days",
+			createdAfter: "7d",
+			shouldFail:   false,
+		},
+		{
+			name:         "Relative date - weeks",
+			updatedAfter: "2w",
+			shouldFail:   false,
+		},
+		{
+			name:         "Human readable - yesterday",
+			createdAfter: "yesterday",
+			shouldFail:   false,
+		},
+		{
+			name:         "Human readable - last-week",
+			updatedAfter: "last-week",
+			shouldFail:   false,
+		},
+		{
+			name:          "Valid date range",
+			createdAfter:  "7d",
+			createdBefore: "today",
+			shouldFail:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &ListCmd{
+				CreatedAfter:  tt.createdAfter,
+				CreatedBefore: tt.createdBefore,
+				UpdatedAfter:  tt.updatedAfter,
+				UpdatedBefore: tt.updatedBefore,
+				ConfigPath:    configPath,
+				Format:        "table",
+			}
+
+			err := cmd.Run()
+			// We expect this to fail at the API call stage, not at date parsing
+			if err != nil && !tt.shouldFail {
+				// Check if error is about date parsing (which would be a test failure)
+				// or about API/authentication (which is expected in tests)
+				errMsg := err.Error()
+				if contains(errMsg, "invalid created-after") ||
+					contains(errMsg, "invalid created-before") ||
+					contains(errMsg, "invalid updated-after") ||
+					contains(errMsg, "invalid updated-before") ||
+					contains(errMsg, "invalid created date range") ||
+					contains(errMsg, "invalid updated date range") {
+					t.Errorf("Date parsing failed: %v", err)
+				}
+				// If error is about API/auth, that's expected in unit tests
+			}
+		})
+	}
+}
+
+// TestListCmdDateParsingInvalidDates tests that invalid date formats return errors
+func TestListCmdDateParsingInvalidDates(t *testing.T) {
+	// Create a temporary config file
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+
+	cfg := &config.Config{}
+	cfg.SetConfigPath(configPath)
+	cfg.SetTokens("fake_token", "fake_refresh", "Bearer", 3600)
+	err := cfg.Save()
+	if err != nil {
+		t.Fatalf("Failed to save config: %v", err)
+	}
+
+	tests := []struct {
+		name          string
+		createdAfter  string
+		createdBefore string
+		expectedError string
+	}{
+		{
+			name:          "Invalid date format",
+			createdAfter:  "invalid-date",
+			expectedError: "invalid created-after date",
+		},
+		{
+			name:          "Invalid before date",
+			createdBefore: "not-a-date",
+			expectedError: "invalid created-before date",
+		},
+		{
+			name:          "Empty relative date",
+			createdAfter:  "d",
+			expectedError: "invalid created-after date",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &ListCmd{
+				CreatedAfter:  tt.createdAfter,
+				CreatedBefore: tt.createdBefore,
+				ConfigPath:    configPath,
+				Format:        "table",
+			}
+
+			err := cmd.Run()
+			if err == nil {
+				t.Error("Expected error for invalid date, got nil")
+				return
+			}
+
+			if !contains(err.Error(), tt.expectedError) {
+				t.Errorf("Expected error containing '%s', got '%v'", tt.expectedError, err)
+			}
+		})
+	}
+}
+
+// TestListCmdDateRangeValidation tests that date range validation works correctly
+func TestListCmdDateRangeValidation(t *testing.T) {
+	// Create a temporary config file
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+
+	cfg := &config.Config{}
+	cfg.SetConfigPath(configPath)
+	cfg.SetTokens("fake_token", "fake_refresh", "Bearer", 3600)
+	err := cfg.Save()
+	if err != nil {
+		t.Fatalf("Failed to save config: %v", err)
+	}
+
+	tests := []struct {
+		name          string
+		createdAfter  string
+		createdBefore string
+		shouldFail    bool
+		expectedError string
+	}{
+		{
+			name:          "Invalid range - after is later than before",
+			createdAfter:  "today",
+			createdBefore: "yesterday",
+			shouldFail:    true,
+			expectedError: "invalid created date range",
+		},
+		{
+			name:          "Valid range - after is earlier than before",
+			createdAfter:  "7d",
+			createdBefore: "today",
+			shouldFail:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := &ListCmd{
+				CreatedAfter:  tt.createdAfter,
+				CreatedBefore: tt.createdBefore,
+				ConfigPath:    configPath,
+				Format:        "table",
+			}
+
+			err := cmd.Run()
+			if tt.shouldFail {
+				if err == nil {
+					t.Error("Expected error for invalid date range, got nil")
+					return
+				}
+				if !contains(err.Error(), tt.expectedError) {
+					t.Errorf("Expected error containing '%s', got '%v'", tt.expectedError, err)
+				}
+			} else if err != nil && contains(err.Error(), "invalid created date range") {
+				t.Errorf("Unexpected date range validation error: %v", err)
+			}
+		})
+	}
+}
+
+// Helper function to check if a string contains a substring
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > len(substr) && containsSubstring(s, substr))
+}
+
+func containsSubstring(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
