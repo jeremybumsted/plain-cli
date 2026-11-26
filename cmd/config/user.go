@@ -11,13 +11,14 @@ import (
 
 // UserCmd configures the user identity for personalized queries
 type UserCmd struct {
-	Email string `flag:"" help:"Your email address in Plain"`
-	List  bool   `flag:"" help:"List all workspace users"`
-	Clear bool   `flag:"" help:"Clear configured user info"`
+	ConfigPath string `kong:"-"`
+	Email      string `flag:"" help:"Your email address in Plain"`
+	List       bool   `flag:"" help:"List all workspace users"`
+	Clear      bool   `flag:"" help:"Clear configured user info"`
 }
 
 func (cmd *UserCmd) Run() error {
-	cfg, err := getConfig("")
+	cfg, err := getConfig(cmd.ConfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}

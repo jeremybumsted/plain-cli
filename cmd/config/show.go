@@ -5,11 +5,13 @@ import (
 )
 
 // ShowCmd shows current configuration
-type ShowCmd struct{}
+type ShowCmd struct {
+	ConfigPath string `kong:"-"`
+}
 
 // Run executes the show command
 func (cmd *ShowCmd) Run() error {
-	cfg, err := getConfig("")
+	cfg, err := getConfig(cmd.ConfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}

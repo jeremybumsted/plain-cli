@@ -2,8 +2,8 @@ package threads
 
 import (
 	"github.com/jeremybumsted/plain-cli/internal/config"
-	"github.com/jeremybumsted/plain-cli/internal/plain"
 	"github.com/jeremybumsted/plain-cli/internal/output"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // ThreadsCmd represents the threads command group

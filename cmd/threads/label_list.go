@@ -99,7 +99,10 @@ func (cmd *LabelListCmd) Run() error {
 }
 
 // printTable formats and prints label types as a table
-func (cmd *LabelListCmd) printTable(formatter interface{ PrintTable([]string, [][]string) error; Info(string) error }, labelTypes []*plain.LabelType) error {
+func (cmd *LabelListCmd) printTable(formatter interface {
+	PrintTable([]string, [][]string) error
+	Info(string) error
+}, labelTypes []*plain.LabelType) error {
 	if len(labelTypes) == 0 {
 		return formatter.Info("No label types found")
 	}

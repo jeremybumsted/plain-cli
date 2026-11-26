@@ -10,9 +10,10 @@ import (
 
 // GetCmd represents the "articles get" command
 type GetCmd struct {
-	ConfigPath string `help:"Path to config file" default:""`
-	Format     string `help:"Output format (markdown, json, quiet)" default:"markdown"`
-	ID         string `arg:"" name:"id" help:"Article ID (hca_*)"`
+	ConfigPath   string `help:"Path to config file" default:""`
+	Format       string `help:"Output format (markdown, json, quiet)" default:"markdown"`
+	HelpCenterID string `help:"Help center ID (required for slug lookup, overrides config)" optional:""`
+	ID           string `arg:"" name:"id-or-slug" help:"Article ID (hca_*) or slug"`
 }
 
 // Run executes the get command
@@ -29,8 +30,20 @@ func (cmd *GetCmd) Run() error {
 		return err
 	}
 
-	// Fetch article
-	article, err := client.GetHelpCenterArticle(cmd.ID)
+	// Fetch article by ID or slug
+	var article *plain.HelpCenterArticle
+	if strings.HasPrefix(cmd.ID, "hca_") {
+		article, err = client.GetHelpCenterArticle(cmd.ID)
+	} else {
+		helpCenterID := cmd.HelpCenterID
+		if helpCenterID == "" {
+			helpCenterID, err = cfg.GetHelpCenterID()
+			if err != nil || helpCenterID == "" {
+				return fmt.Errorf("help center ID required for slug lookup: use --help-center-id or configure via 'plain config'")
+			}
+		}
+		article, err = client.GetHelpCenterArticleBySlug(helpCenterID, cmd.ID)
+	}
 	if err != nil {
 		return fmt.Errorf("failed to fetch article: %w", err)
 	}

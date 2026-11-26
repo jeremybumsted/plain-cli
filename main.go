@@ -4,9 +4,15 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
+	"github.com/jeremybumsted/plain-cli/cmd/accounts"
 	"github.com/jeremybumsted/plain-cli/cmd/articles"
+	"github.com/jeremybumsted/plain-cli/cmd/companies"
 	"github.com/jeremybumsted/plain-cli/cmd/config"
+	"github.com/jeremybumsted/plain-cli/cmd/customers"
+	"github.com/jeremybumsted/plain-cli/cmd/helpcenters"
 	"github.com/jeremybumsted/plain-cli/cmd/threads"
+	"github.com/jeremybumsted/plain-cli/cmd/tiers"
+	workspacecmd "github.com/jeremybumsted/plain-cli/cmd/workspace"
 )
 
 var (
@@ -17,9 +23,15 @@ var (
 
 // CLI is the root command structure
 type CLI struct {
-	Threads  threads.ThreadsCmd `cmd:"" help:"Manage support threads"`
-	Articles articles.ArticlesCmd `cmd:"" help:"Manage help center articles"`
-	Config   config.ConfigCmd   `cmd:"" help:"Configure Plain CLI"`
+	Threads     threads.ThreadsCmd         `cmd:"" help:"Manage support threads"`
+	Customers   customers.CustomersCmd     `cmd:"" help:"Inspect customers"`
+	Companies   companies.CompaniesCmd     `cmd:"" help:"Inspect companies"`
+	Accounts    accounts.AccountsCmd       `cmd:"" help:"Inspect accounts"`
+	Tiers       tiers.TiersCmd             `cmd:"" help:"Inspect tiers"`
+	Workspace   workspacecmd.WorkspaceCmd  `cmd:"" help:"Inspect workspace details"`
+	HelpCenters helpcenters.HelpCentersCmd `cmd:"" name:"help-centers" help:"Inspect help centers"`
+	Articles    articles.ArticlesCmd       `cmd:"" help:"Manage help center articles"`
+	Config      config.ConfigCmd           `cmd:"" help:"Configure Plain CLI"`
 
 	// Global flags
 	ConfigPath string `name:"config" help:"Path to config file" type:"path" env:"PLAIN_CONFIG"`
@@ -46,7 +58,7 @@ func main() {
 	cli := &CLI{}
 	ctx := kong.Parse(cli,
 		kong.Name("plain"),
-		kong.Description("Plain support in the CLI - manage threads, customers, and more"),
+		kong.Description("Plain support in the CLI - manage threads, customers, companies, accounts, tiers, workspace, and help center content"),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,

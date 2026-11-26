@@ -13,14 +13,15 @@ import (
 
 // ConfigCmd represents the config command group
 type ConfigCmd struct {
-	Show  ShowCmd  `cmd:"" help:"Show current configuration"`
-	Reset ResetCmd `cmd:"" help:"Reset configuration"`
-	User  UserCmd  `cmd:"" help:"Configure your user identity"`
+	ConfigPath string   `kong:"-"`
+	Show       ShowCmd  `cmd:"" help:"Show current configuration"`
+	Reset      ResetCmd `cmd:"" help:"Reset configuration"`
+	User       UserCmd  `cmd:"" help:"Configure your user identity"`
 }
 
 // Run executes the interactive configuration
 func (cmd *ConfigCmd) Run() error {
-	cfg, err := getConfig("")
+	cfg, err := getConfig(cmd.ConfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}

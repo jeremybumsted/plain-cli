@@ -8,8 +8,9 @@ import (
 
 // ArticlesCmd represents the articles command group
 type ArticlesCmd struct {
-	List ListCmd `cmd:"" help:"List help center articles"`
-	Get  GetCmd  `cmd:"" help:"Get article by ID"`
+	List   ListCmd   `cmd:"" help:"List help center articles"`
+	Get    GetCmd    `cmd:"" help:"Get article by ID"`
+	Upsert UpsertCmd `cmd:"" help:"Create or update a help center article"`
 }
 
 // Context holds global flags passed from the root command

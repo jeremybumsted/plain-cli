@@ -36,7 +36,7 @@ func (cmd *ListCmd) Run() error {
 	// 2. Get authenticated Plain API client
 	client, err := getClient(cfg)
 	if err != nil {
-		return fmt.Errorf("not authenticated: run 'plain auth login'")
+		return fmt.Errorf("not authenticated: run 'plain config'")
 	}
 
 	// 3. Validate flags - ensure --mine and --assignee are mutually exclusive
@@ -160,7 +160,10 @@ func (cmd *ListCmd) Run() error {
 }
 
 // printTable formats and prints threads as a table
-func (cmd *ListCmd) printTable(formatter interface{ PrintTable([]string, [][]string) error; Info(string) error }, response *plain.ThreadsResponse) error {
+func (cmd *ListCmd) printTable(formatter interface {
+	PrintTable([]string, [][]string) error
+	Info(string) error
+}, response *plain.ThreadsResponse) error {
 	if len(response.Threads) == 0 {
 		return formatter.Info("No threads found")
 	}

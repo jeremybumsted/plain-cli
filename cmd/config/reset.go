@@ -7,12 +7,13 @@ import (
 
 // ResetCmd resets configuration
 type ResetCmd struct {
-	Yes bool `help:"Skip confirmation" short:"y"`
+	ConfigPath string `kong:"-"`
+	Yes        bool   `help:"Skip confirmation" short:"y"`
 }
 
 // Run executes the reset command
 func (cmd *ResetCmd) Run() error {
-	cfg, err := getConfig("")
+	cfg, err := getConfig(cmd.ConfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}

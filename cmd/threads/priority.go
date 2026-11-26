@@ -2,8 +2,6 @@ package threads
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
@@ -23,7 +21,7 @@ func (cmd *PriorityCmd) Run() error {
 	threadID := extractThreadID(cmd.ThreadID)
 
 	// Parse priority string to integer
-	priorityInt, err := parsePriorityString(cmd.Priority)
+	priorityInt, err := plain.ParsePriority(cmd.Priority)
 	if err != nil {
 		return fmt.Errorf("invalid priority: %w", err)
 	}
@@ -75,34 +73,4 @@ func (cmd *PriorityCmd) Run() error {
 
 	// Default: success message
 	return formatter.Success(fmt.Sprintf("Priority changed to %s", priorityName))
-}
-
-// parsePriorityString converts a priority string to an integer value
-// Accepts: "urgent", "high", "normal", "low", "0", "1", "2", "3"
-// Returns: 3 for urgent, 2 for high, 1 for normal, 0 for low
-func parsePriorityString(priority string) (int, error) {
-	// Normalize to lowercase
-	priority = strings.ToLower(strings.TrimSpace(priority))
-
-	// Try parsing as integer first
-	if val, err := strconv.Atoi(priority); err == nil {
-		if val >= 0 && val <= 3 {
-			return val, nil
-		}
-		return 0, fmt.Errorf("priority must be between 0 and 3, got %d", val)
-	}
-
-	// Parse as string
-	switch priority {
-	case "urgent":
-		return 3, nil
-	case "high":
-		return 2, nil
-	case "normal":
-		return 1, nil
-	case "low":
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("invalid priority '%s', expected: urgent, high, normal, low, or 0-3", priority)
-	}
 }

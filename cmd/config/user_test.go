@@ -136,9 +136,9 @@ func TestUserCmd_SetUserInfo(t *testing.T) {
 
 func TestUserCmd_Flags(t *testing.T) {
 	tests := []struct {
-		name     string
-		cmd      UserCmd
-		wantList bool
+		name      string
+		cmd       UserCmd
+		wantList  bool
 		wantClear bool
 		wantEmail string
 	}{

@@ -9,8 +9,8 @@ import (
 
 // AttachmentsCmd represents the threads attachments command group
 type AttachmentsCmd struct {
-	List     ListAttachmentsCmd     `cmd:"" help:"List all attachments in a thread"`
-	Download DownloadAttachmentCmd  `cmd:"" help:"Download a specific attachment"`
+	List     ListAttachmentsCmd    `cmd:"" help:"List all attachments in a thread"`
+	Download DownloadAttachmentCmd `cmd:"" help:"Download a specific attachment"`
 }
 
 // ListAttachmentsCmd lists all attachments in a thread

@@ -23,7 +23,7 @@ const (
 
 // Config holds the CLI configuration including OAuth credentials
 type Config struct {
-	// OAuth token fields
+	// API token fields
 	AccessToken  string    `json:"access_token,omitempty"`
 	RefreshToken string    `json:"refresh_token,omitempty"`
 	TokenType    string    `json:"token_type,omitempty"`
@@ -140,18 +140,18 @@ func (c *Config) GetToken() (string, error) {
 
 	// Use stored token
 	if c.AccessToken == "" {
-		return "", errors.New("not authenticated: run 'plain auth login'")
+		return "", errors.New("not authenticated: run 'plain config'")
 	}
 
 	// Check expiration
 	if !c.ExpiresAt.IsZero() && time.Now().After(c.ExpiresAt) {
-		return "", errors.New("token expired: run 'plain auth login'")
+		return "", errors.New("token expired: run 'plain config'")
 	}
 
 	return c.AccessToken, nil
 }
 
-// SetTokens stores OAuth tokens in the config
+// SetTokens stores API tokens in the config
 func (c *Config) SetTokens(accessToken, refreshToken, tokenType string, expiresIn int) {
 	c.AccessToken = accessToken
 	c.RefreshToken = refreshToken

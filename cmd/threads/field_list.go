@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/jeremybumsted/plain-cli/internal/cache"
-	"github.com/jeremybumsted/plain-cli/internal/plain"
 	"github.com/jeremybumsted/plain-cli/internal/output"
+	"github.com/jeremybumsted/plain-cli/internal/plain"
 )
 
 // FieldListCmd handles listing thread field schemas from cache

@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -129,16 +128,16 @@ func (c *Client) request(method, endpoint string, body interface{}, result inter
 
 // Thread represents a support thread
 type Thread struct {
-	ID          string     `json:"id"`
-	Title       string     `json:"title"`
-	Status      string     `json:"status"`
-	Priority    int        `json:"priority"`
-	AssignedTo  *User      `json:"assignedTo,omitempty"`
-	CreatedAt   DateTime   `json:"createdAt"`
-	UpdatedAt   DateTime   `json:"updatedAt"`
-	Labels      []Label    `json:"labels,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Timeline    *Timeline  `json:"timeline,omitempty"`
+	ID          string    `json:"id"`
+	Title       string    `json:"title"`
+	Status      string    `json:"status"`
+	Priority    int       `json:"priority"`
+	AssignedTo  *User     `json:"assignedTo,omitempty"`
+	CreatedAt   DateTime  `json:"createdAt"`
+	UpdatedAt   DateTime  `json:"updatedAt"`
+	Labels      []Label   `json:"labels,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Timeline    *Timeline `json:"timeline,omitempty"`
 }
 
 // FormatPriority converts a priority integer to a human-readable string
@@ -253,12 +252,14 @@ type HelpCenter struct {
 
 // HelpCenterArticle represents a help center article
 type HelpCenterArticle struct {
-	ID          string       `json:"id"`
-	Title       string       `json:"title"`
-	ContentHTML string       `json:"contentHtml"`
-	Slug        string       `json:"slug"`
-	Status      string       `json:"status"`
-	UpdatedAt   DateTime     `json:"updatedAt"`
+	ID          string        `json:"id"`
+	Title       string        `json:"title"`
+	Description string        `json:"description,omitempty"`
+	ContentHTML string        `json:"contentHtml"`
+	Slug        string        `json:"slug"`
+	Status      string        `json:"status"`
+	CreatedAt   DateTime      `json:"createdAt"`
+	UpdatedAt   DateTime      `json:"updatedAt"`
 	Group       *ArticleGroup `json:"articleGroup"`
 }
 
@@ -266,6 +267,7 @@ type HelpCenterArticle struct {
 type ArticleGroup struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+	Slug string `json:"slug,omitempty"`
 }
 
 // Timeline represents a thread timeline
@@ -286,11 +288,11 @@ type EntryData struct {
 	Typename string `json:"__typename"`
 
 	// NoteEntry fields
-	NoteID      string       `json:"noteId,omitempty"`
-	NoteText    string       `json:"noteText,omitempty"`
-	Text        string       `json:"text,omitempty"` // fallback for compatibility
-	Markdown    string       `json:"markdown,omitempty"`
-	IsEdited    bool         `json:"isEdited,omitempty"`
+	NoteID   string `json:"noteId,omitempty"`
+	NoteText string `json:"noteText,omitempty"`
+	Text     string `json:"text,omitempty"` // fallback for compatibility
+	Markdown string `json:"markdown,omitempty"`
+	IsEdited bool   `json:"isEdited,omitempty"`
 
 	// ChatEntry fields
 	ChatID         string    `json:"chatId,omitempty"`
@@ -531,15 +533,11 @@ func (c *Client) ListThreads(filters *ThreadFilters) (*ThreadsResponse, error) {
 		}
 
 		if filters.Priority != "" {
-			// Use "priorities" (plural) - priority values must be integers
-			// Convert string to int
-			priority, err := strconv.Atoi(filters.Priority)
+			priority, err := ParsePriority(filters.Priority)
 			if err != nil {
-				return nil, fmt.Errorf("invalid priority value '%s': must be an integer", filters.Priority)
+				return nil, fmt.Errorf("invalid priority value '%s': %w", filters.Priority, err)
 			}
-			if priority > 0 {
-				threadFilters["priorities"] = []int{priority}
-			}
+			threadFilters["priorities"] = []int{priority}
 		}
 
 		if len(filters.LabelIDs) > 0 {
@@ -948,20 +946,20 @@ func (c *Client) GetThread(threadID string, includeTimeline bool) (*Thread, erro
 	var response struct {
 		Data struct {
 			Thread *struct {
-				ID          string   `json:"id"`
-				Title       string   `json:"title"`
-				Description string   `json:"description"`
-				Status      string   `json:"status"`
-				Priority    int      `json:"priority"`
-				AssignedTo  *User    `json:"assignedTo"`
-				Labels      []Label  `json:"labels"`
-				CreatedAt   DateTime `json:"createdAt"`
-				UpdatedAt   DateTime `json:"updatedAt"`
+				ID              string   `json:"id"`
+				Title           string   `json:"title"`
+				Description     string   `json:"description"`
+				Status          string   `json:"status"`
+				Priority        int      `json:"priority"`
+				AssignedTo      *User    `json:"assignedTo"`
+				Labels          []Label  `json:"labels"`
+				CreatedAt       DateTime `json:"createdAt"`
+				UpdatedAt       DateTime `json:"updatedAt"`
 				TimelineEntries *struct {
 					Edges []struct {
 						Node struct {
-							ID        string    `json:"id"`
-							Timestamp DateTime  `json:"timestamp"`
+							ID        string   `json:"id"`
+							Timestamp DateTime `json:"timestamp"`
 							Actor     struct {
 								Typename string `json:"__typename"`
 								// UserActor fields
@@ -1128,10 +1126,14 @@ func (c *Client) SearchThreads(query string, filters *ThreadFilters) (*ThreadsRe
 	filterMap := make(map[string]interface{})
 	if filters != nil {
 		if filters.Status != "" {
-			filterMap["status"] = []string{filters.Status}
+			filterMap["statuses"] = []string{filters.Status}
 		}
 		if filters.Priority != "" {
-			filterMap["priority"] = []int{parsePriority(filters.Priority)}
+			priority, err := ParsePriority(filters.Priority)
+			if err != nil {
+				return nil, fmt.Errorf("invalid priority value '%s': %w", filters.Priority, err)
+			}
+			filterMap["priorities"] = []int{priority}
 		}
 		if filters.AssigneeID != "" {
 			filterMap["assignedToUser"] = []string{filters.AssigneeID}
@@ -1221,22 +1223,6 @@ func (c *Client) SearchThreads(query string, filters *ThreadFilters) (*ThreadsRe
 		Threads: threads,
 		Total:   len(threads),
 	}, nil
-}
-
-// parsePriority converts a priority string to an integer value
-func parsePriority(priority string) int {
-	switch priority {
-	case "urgent":
-		return 0
-	case "high":
-		return 1
-	case "normal":
-		return 2
-	case "low":
-		return 3
-	default:
-		return 2 // Default to normal
-	}
 }
 
 // Write Operations (Mutations)
@@ -1857,11 +1843,13 @@ func (c *Client) GetHelpCenterArticle(articleID string) (*HelpCenterArticle, err
 			helpCenterArticle(id: $id) {
 				id
 				title
+				description
 				contentHtml
 				slug
 				status
+				createdAt { iso8601 }
 				updatedAt { iso8601 }
-				articleGroup { id name }
+				articleGroup { id name slug }
 			}
 		}
 	`
@@ -1912,11 +1900,13 @@ func (c *Client) ListHelpCenterArticles(helpCenterID string, includeContent bool
 						node {
 							id
 							title
+							description
 							slug
 							status
 							%s
+							createdAt { iso8601 }
 							updatedAt { iso8601 }
-							articleGroup { id name }
+							articleGroup { id name slug }
 						}
 					}
 					pageInfo {

@@ -5,7 +5,7 @@ A command-line interface for working with [Plain](https://plain.com)
 
 ## Overview
 
-Plain CLI provides a fast and efficient way to interact with your Plain support workspace without leaving the command line. Manage threads, assignments, labels, and more with simple commands.
+Plain CLI provides a fast and efficient way to interact with your Plain support workspace without leaving the command line. Manage threads, customers, companies, accounts, tiers, workspace metadata, help centers, and articles with simple commands.
 
 Includes a sample agent skill for using with Claude/Codex/Amp/etc.
 
@@ -55,6 +55,13 @@ plain threads get th_123abc
 plain articles list
 ```
 
+1. Inspect your workspace or customers:
+
+```bash
+plain workspace show
+plain customers list
+```
+
 ## Features
 
 ### Configuration
@@ -65,13 +72,16 @@ Set up and manage your Plain CLI configuration:
 - `plain config show` - Display current configuration
 - `plain config reset` - Clear all configuration
 
-### Authentication
+### Workspace And Help Centers
 
-Manage your Plain API authentication:
+Inspect top-level workspace metadata and available help centers:
 
-- `plain auth login` - Authenticate with Plain API token (alternative to `plain config`)
-- `plain auth status` - Check current authentication status
-- `plain auth logout` - Log out and clear credentials
+- `plain workspace show` - Show the current workspace
+- `plain help-centers list` - List available help centers
+- `plain help-centers group get <id>` - Inspect a help center article group
+- `plain help-centers group create --name <name>` - Create an article group in your configured help center
+- `plain help-centers group update <id> --name <name>` - Rename an article group
+- `plain help-centers group delete <id>` - Delete an article group
 
 ### Help Center Articles
 
@@ -79,10 +89,28 @@ Access and browse help center documentation (optimized for AI agents):
 
 - `plain articles list` - List all articles in your help center
 - `plain articles list --preview` - List articles with content previews (helps identify relevant articles)
-- `plain articles get <id>` - Get full article content as clean markdown
+- `plain articles get <id>` - Get full article content as clean markdown by article ID
+- `plain articles get <slug>` - Get full article content as clean markdown by article slug
+- `plain articles upsert --title <title> --description <description> --content-file <path>` - Create or update a help center article from HTML content
 - Output formats: markdown (default), JSON, quiet
 
 **AI Agent Integration**: Articles are output in clean markdown format, making them perfect for tools like Claude Code, Cursor, or other AI coding assistants. Agents can search articles with `list --preview` and fetch full content with `get`.
+
+### Customer And Account Reads
+
+Inspect customer and account entities without leaving the terminal:
+
+- `plain customers list` - List customers
+- `plain customers get <id>` - Get a customer by Plain customer ID
+- `plain customers get-by-email <email>` - Get a customer by email address
+- `plain customers get-by-ext-id <external-id>` - Get a customer by external ID
+- `plain customers search <query>` - Search customers by ID, name, email, or external ID
+- `plain companies list` - List companies
+- `plain companies get <id>` - Get a company by ID
+- `plain accounts list` - List accounts
+- `plain accounts get <id>` - Get an account by ID
+- `plain tiers list` - List tiers
+- `plain tiers get <id>` - Get a tier by ID
 
 ### Thread Management
 
@@ -247,11 +275,49 @@ plain articles list --preview
 # Get specific article as markdown
 plain articles get hca_123abc
 
+# Get article by slug (uses configured help center unless overridden)
+plain articles get getting-started
+
+# Get article by slug from a specific help center
+plain articles get getting-started --help-center-id hc_456def
+
 # Get article as JSON
-plain articles get hca_123abc --format json
+plain --json articles get hca_123abc
+
+# Create or update an article from HTML
+plain articles upsert \
+  --title "Getting Started" \
+  --description "Quick start guide for new users" \
+  --content-file ./article.html \
+  --status published
 
 # Override help center
 plain articles list --help-center-id hc_456def
+
+# Create and manage article groups
+plain help-centers group create --name "Getting Started"
+plain help-centers group update hcag_123abc --name "Guides"
+plain help-centers group delete hcag_123abc
+```
+
+### Customer And Account Reads
+
+```bash
+# List customers
+plain customers list
+
+# Find a customer by email
+plain customers get-by-email alice@example.com
+
+# Search customers by name, email, or external ID
+plain customers search alice
+
+# Inspect related account entities
+plain companies list
+plain accounts get ten_123abc
+plain tiers list
+plain workspace show
+plain help-centers list
 ```
 
 ### Thread Management

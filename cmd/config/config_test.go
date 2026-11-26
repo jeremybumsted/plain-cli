@@ -376,8 +376,8 @@ func TestShowCurrentSettingsWithUser(t *testing.T) {
 			expectUserInfo: true,
 		},
 		{
-			name: "With empty config",
-			config: &config.Config{},
+			name:           "With empty config",
+			config:         &config.Config{},
 			expectUserInfo: false,
 		},
 	}
