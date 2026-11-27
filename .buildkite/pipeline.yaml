@@ -1,3 +1,5 @@
+agents:
+  queue: hosted-medium
 steps:
   - label: ":golangci-lint: lint"
     command: .buildkite/scripts/lint.sh
@@ -28,4 +30,3 @@ steps:
       GITHUB_TOKEN: GITHUB_API_TOKEN
     if: build.tag != null
     depends_on: release-blocker
-
