@@ -1,0 +1,11 @@
+caches:
+  - name: go_modules
+    cache_key:
+      - plain-cli-go-mod-v1
+      - agent: os
+      - agent: arch
+      - checksum: mise.toml
+        fallback_limit: true
+      - checksum: [go.mod, go.sum]
+    target_paths:
+      - .buildkite/cache/go-mod

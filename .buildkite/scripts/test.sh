@@ -2,13 +2,7 @@
 
 set -euo pipefail
 
-echo "--- Checking dependencies up to date"
-mise trust -y
-
-mise install
-
-echo "--- Downloading :go: modules"
-mise x -- go mod download
+source "$(dirname "${BASH_SOURCE[0]}")/setup-go.sh"
 
 echo "--- Running :go: Tests"
 

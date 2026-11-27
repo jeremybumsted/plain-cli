@@ -23,6 +23,7 @@ dist/
 
 # Dependency directories
 vendor/
+/.buildkite/cache/
 
 # Go workspace file
 go.work
