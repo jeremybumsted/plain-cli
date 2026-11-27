@@ -22,7 +22,7 @@ func applyRootFlags(target reflect.Value, cli *CLI) {
 	if !target.IsValid() {
 		return
 	}
-	if target.Kind() == reflect.Ptr {
+	if target.Kind() == reflect.Pointer {
 		if target.IsNil() {
 			return
 		}
