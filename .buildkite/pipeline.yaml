@@ -1,5 +1,5 @@
 agents:
-  queue: hosted-medium
+  queue: default
 steps:
   - label: ":golangci-lint: lint"
     command: .buildkite/scripts/lint.sh
